@@ -366,27 +366,32 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
     </div>
     <div class="sp" id="sp-clips">
       <div class="ptitle">My Clips</div>
-      <div class="shdr"><div class="stitle">&#9889; Saved Clips</div></div>
-      <div class="cgrid" id="saved-clips-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Click My Clips to load your saved clips</div>
-      </div>
-      <div class="bcard">
-        <div class="bhdr"><div class="blbl">&#128081; Best Clip From Last Stream</div><span class="bhot">&#128293; High Potential</span></div>
+      <div class="bcard" id="best-clip-card" style="display:none">
+        <div class="bhdr"><div class="blbl">&#128081; Best Clip From Last Recording</div><span class="bhot" id="best-clip-score">&#128293; 98/100</span></div>
         <div class="bbd">
-          <div class="bth"><div class="bpip">98/100</div><div class="cpl">&#9654;</div></div>
+          <div class="bth"><div class="bpip" id="best-clip-pip">98/100</div><div class="cpl">&#9654;</div></div>
           <div class="binfo">
-            <h3>Insane Play - You Won't Believe This!</h3>
-            <div class="tags"><span class="tag">#Clutch</span><span class="tag">#Insane</span><span class="tag">#Gaming</span></div>
-            <div class="dur">Duration: 33s</div>
-            <div class="bact"><button class="btn-pv">&#9654; Preview</button><button class="btn-pn">&#10003; Post Now</button></div>
+            <h3 id="best-clip-title">Loading...</h3>
+            <div class="dur" id="best-clip-time"></div>
+            <div class="bact">
+              <a id="best-clip-watch" href="#" target="_blank"><button class="btn-pv">&#9654; Watch</button></a>
+              <a id="best-clip-studio" href="#" target="_blank"><button class="btn-pn">&#9986; Clip in Studio</button></a>
+            </div>
           </div>
         </div>
       </div>
-      <div class="shdr" style="margin-top:0"><div class="stitle">All Clips</div><div style="font-size:12px;color:var(--muted);cursor:pointer">Sort by Score &#8595;</div></div>
-      <div class="cgrid">
-        <div class="cc"><div class="ct t1"><div class="csc sh">96/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">Epic Gaming Moment</div><div class="tags" style="margin-bottom:8px"><span class="tag">#Gaming</span><span class="tag">#Epic</span></div><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div>
-        <div class="cc"><div class="ct t2"><div class="csc sh">85/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">Clutch Win</div><div class="tags" style="margin-bottom:8px"><span class="tag">#Crazy</span><span class="tag">#Wow</span></div><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div>
-        <div class="cc"><div class="ct t3"><div class="csc sm">74/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">Funny Reaction</div><div class="tags" style="margin-bottom:8px"><span class="tag">#LoL</span><span class="tag">#OMG</span></div><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div>
+      <div class="shdr" style="margin-top:0;position:relative">
+        <div class="stitle">&#9889; <span id="clips-filter-label">AI Clips</span></div>
+        <div style="position:relative">
+          <div onclick="toggleClipsFilter()" style="font-size:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--border2);padding:5px 10px;border-radius:8px">Filter &#9660;</div>
+          <div id="clips-filter-dd" style="display:none;position:absolute;right:0;top:32px;background:#1a1a40;border:1px solid rgba(124,92,252,0.3);border-radius:12px;padding:6px;width:160px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.5)">
+            <div onclick="setClipsFilter('ai')" id="filter-ai" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#c4b5fd;background:rgba(124,92,252,0.15)">&#9889; AI Clips</div>
+            <div onclick="setClipsFilter('manual')" id="filter-manual" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--muted)">&#9654; Clips I Made</div>
+          </div>
+        </div>
+      </div>
+      <div class="cgrid" id="saved-clips-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Loading your clips...</div>
       </div>
     </div>
   </div>
@@ -823,7 +828,8 @@ document.addEventListener('click',function(e){if(!e.target.closest('.nav-right')
 // NAV
 function showSub(id,el){document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');var ca=document.getElementById('ca'),coach=document.getElementById('sp-coach'),editor=document.getElementById('sp-editor');document.querySelectorAll('.sp').forEach(function(s){s.classList.remove('on')});coach.classList.remove('on');editor.classList.remove('on');editor.style.display='none';coach.style.display='none';ca.style.display='';if(id==='coach'){ca.style.display='none';coach.style.display='flex';coach.classList.add('on')}else if(id==='editor'){ca.style.display='none';editor.style.display='flex';editor.classList.add('on')}else{ca.style.display='';document.getElementById('sp-'+id).classList.add('on');ca.scrollTop=0;if(id==='clips')loadSavedClips()}}
 
-async function loadSavedClips(){
+async function loadSavedClips(filterType){
+  if(!filterType)filterType='ai';
   var grid=document.getElementById('saved-clips-grid');
   if(!grid)return;
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Loading...</div>';
@@ -840,6 +846,23 @@ async function loadSavedClips(){
   }catch(e){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:#f87171">Could not load clips</div>'}
 }
 
+function toggleClipsFilter(){
+  var dd=document.getElementById('clips-filter-dd');
+  dd.style.display=dd.style.display==='none'?'block':'none';
+}
+function setClipsFilter(type){
+  document.getElementById('clips-filter-dd').style.display='none';
+  document.getElementById('filter-ai').style.color=type==='ai'?'#c4b5fd':'var(--muted)';
+  document.getElementById('filter-ai').style.background=type==='ai'?'rgba(124,92,252,0.15)':'transparent';
+  document.getElementById('filter-manual').style.color=type==='manual'?'#c4b5fd':'var(--muted)';
+  document.getElementById('filter-manual').style.background=type==='manual'?'rgba(124,92,252,0.15)':'transparent';
+  document.getElementById('clips-filter-label').textContent=type==='ai'?'AI Clips':'Clips I Made';
+  loadSavedClips(type);
+}
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('clips-filter-dd');
+  if(dd&&!e.target.closest('#clips-filter-dd')&&!e.target.closest('[onclick="toggleClipsFilter()"]'))dd.style.display='none';
+});
 async function deleteClip(id,btn){
   if(!confirm('Delete this clip?'))return;
   await sb.from('clips').delete().eq('id',id);
@@ -906,7 +929,8 @@ async function generateClips(){
             timestamp_end:clip.end_timestamp,
             viral_score:clip.viral_score,
             reason:clip.reason||'',
-            youtube_url:clip.youtube_url
+            youtube_url:clip.youtube_url,
+            clip_type:'ai'
           });
         }
       }
