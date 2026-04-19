@@ -272,7 +272,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 .av-section{margin-bottom:20px}
 .av-section-title{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <canvas id="canvas"></canvas>
@@ -868,7 +868,7 @@ document.addEventListener('click',function(e){
 });
 async function deleteClip(id,btn){
   if(!confirm('Delete this clip?'))return;
-  await sb.from('clips').delete().eq('id',id);
+  await fetch(BACKEND_URL+'/api/delete-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});
   loadSavedClips();
 }
 
@@ -916,28 +916,30 @@ async function generateClips(){
       return'<div class="cc"><div class="ct" style="background:'+bgs[i%3]+';flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.timestamp+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.end_timestamp+'</div></div><div class="cb"><div class="ctl">'+clip.title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.4">'+clip.reason+'</div><div class="cm"><span class="cv">'+clip.timestamp+' - '+clip.end_timestamp+'</span><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><a href="'+clip.studio_url+'" target="_blank"><button class="cbtn edit">&#9986; Clip</button></a></div></div></div></div>';
     }).join('');
     btn.textContent='\u2705 Done!';
-    // Save clips to Supabase
+    // Save clips via Render backend
     try{
       var uid=currentUser?currentUser.id:null;
       if(uid){
         for(var ci=0;ci<data.clips.length;ci++){
           var clip=data.clips[ci];
-          var saveRes=await sb.from('clips').insert({
-            user_id:uid,
-            video_url:url,
-            video_title:data.video_title||'',
-            clip_title:clip.title,
-            timestamp_start:clip.timestamp,
-            timestamp_end:clip.end_timestamp,
-            viral_score:clip.viral_score,
-            reason:clip.reason||'',
-            youtube_url:clip.youtube_url,
-            clip_type:'ai'
+          await fetch(BACKEND_URL+'/api/save-clip',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+              user_id:uid,
+              video_url:url,
+              video_title:data.video_title||'',
+              clip_title:clip.title,
+              timestamp_start:clip.timestamp,
+              timestamp_end:clip.end_timestamp,
+              viral_score:clip.viral_score,
+              reason:clip.reason||'',
+              youtube_url:clip.youtube_url,
+              studio_url:clip.studio_url||'',
+              clip_type:'ai'
+            })
           });
-          console.log('Save result:',saveRes);
         }
-      } else {
-        console.log('No user logged in, cannot save');
       }
     }catch(saveErr){console.log('Save error:',saveErr)}
   }catch(e){
