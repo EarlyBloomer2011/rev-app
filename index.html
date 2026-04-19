@@ -615,11 +615,15 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 
 <script>
 var sb;
+var currentUser=null;
 window.addEventListener('load',function(){
   sb=window.supabase.createClient(
     'https://hfynovtqwtzbaagcxpsi.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmeW5vdnRxd3R6YmFhZ2N4cHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMDQxNDYsImV4cCI6MjA5MTU4MDE0Nn0.YWYBENCjIMP-RwbcJAbH8KeX4sO5yEWKq0WBS7vRElw'
   );
+  sb.auth.onAuthStateChange(function(event,session){
+    currentUser=session?session.user:null;
+  });
 });
 
 var cv=document.getElementById('canvas'),ctx=cv.getContext('2d');
@@ -834,9 +838,8 @@ async function loadSavedClips(filterType){
   if(!grid)return;
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Loading...</div>';
   try{
-    var sess=await sb.auth.getSession();
-    if(!sess||!sess.data||!sess.data.session){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Log in to see saved clips</div>';return}
-    var uid=sess.data.session.user.id;
+    var uid=currentUser?currentUser.id:null;
+    if(!uid){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Log in to see saved clips</div>';return}
     var res=await sb.from('clips').select('*').eq('user_id',uid).order('created_at',{ascending:false});
     if(!res.data||res.data.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No saved clips yet. Generate some clips first!</div>';return}
     var colors=['t1','t2','t3'];
@@ -915,12 +918,11 @@ async function generateClips(){
     btn.textContent='\u2705 Done!';
     // Save clips to Supabase
     try{
-      var sess=await sb.auth.getSession();
-      var uid=sess&&sess.data&&sess.data.session?sess.data.session.user.id:null;
+      var uid=currentUser?currentUser.id:null;
       if(uid){
         for(var ci=0;ci<data.clips.length;ci++){
           var clip=data.clips[ci];
-          await sb.from('clips').insert({
+          var saveRes=await sb.from('clips').insert({
             user_id:uid,
             video_url:url,
             video_title:data.video_title||'',
@@ -932,7 +934,10 @@ async function generateClips(){
             youtube_url:clip.youtube_url,
             clip_type:'ai'
           });
+          console.log('Save result:',saveRes);
         }
+      } else {
+        console.log('No user logged in, cannot save');
       }
     }catch(saveErr){console.log('Save error:',saveErr)}
   }catch(e){
