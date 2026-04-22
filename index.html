@@ -840,10 +840,13 @@ async function loadSavedClips(filterType){
   try{
     var uid=currentUser?currentUser.id:null;
     if(!uid){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Log in to see saved clips</div>';return}
-    var res=await sb.from('clips').select('*').eq('user_id',uid).order('created_at',{ascending:false});
+   var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:filterType})});
+    var rd=await res.json();
+    if(!rd.success||!rd.clips||rd.clips.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No saved clips yet. Generate some clips first!</div>';return}
+    var clips=rd.clips;var best=clips[0];var bc=document.getElementById('best-clip-card');if(bc){bc.style.display='block';document.getElementById('best-clip-title').textContent=best.clip_title;document.getElementById('best-clip-pip').textContent=best.viral_score+'/100';document.getElementById('best-clip-score').textContent='\uD83D\uDD25 '+best.viral_score+'/100';document.getElementById('best-clip-time').textContent=best.timestamp_start+' - '+best.timestamp_end+' \u2022 '+best.video_title;document.getElementById('best-clip-watch').href=best.youtube_url||'#';document.getElementById('best-clip-studio').href=best.studio_url||'#';}
     if(!res.data||res.data.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No saved clips yet. Generate some clips first!</div>';return}
     var colors=['t1','t2','t3'];
-    grid.innerHTML=res.data.map(function(clip,i){
+    grid.innerHTML=clips.map(function(clip,i){
       return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
     }).join('');
   }catch(e){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:#f87171">Could not load clips</div>'}
