@@ -352,7 +352,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">-</div><div class="scd" id="scp-week">Loading...</div></div>
         <div class="sc b"><div class="scl">Total Views</div><div class="scv b">14.2K</div><div class="scd">&#8593; 2.1K this week</div></div>
         <div class="sc g"><div class="scl">Followers Gained</div><div class="scv g">+312</div><div class="scd">&#8593; 48 this week</div></div>
-        <div class="sc am"><div class="scl">Best Score</div><div class="scv am">98</div><div class="scd">Top 2% of clips</div></div>
+        <div class="sc am"><div class="scl">Best Score This Week</div><div class="scv am" id="dash-best-score">-</div><div class="scd" id="dash-best-percent">Loading...</div></div>
       </div>
       <div class="shdr">
         <div class="stitle">&#9889; Generated Clips <span class="sbadge" id="dash-badge" style="display:none">Ready to Post</span></div>
@@ -819,9 +819,29 @@ async function loadDashStats(){
     document.getElementById('scp').textContent=total;
     var now=Date.now();
     var weekAgo=now-7*24*60*60*1000;
-    var thisWeek=clips.filter(function(c){return c.created_at&&new Date(c.created_at).getTime()>weekAgo}).length;
+    var weekClips=clips.filter(function(c){return c.created_at&&new Date(c.created_at).getTime()>weekAgo});
+    var thisWeek=weekClips.length;
     var weekEl=document.getElementById('scp-week');
     if(weekEl)weekEl.textContent=thisWeek>0?'\u2191 '+thisWeek+' this week':'No new clips this week';
+    var bestScoreEl=document.getElementById('dash-best-score');
+    var bestPercentEl=document.getElementById('dash-best-percent');
+    if(bestScoreEl){
+      if(weekClips.length>0){
+        var bestScore=Math.max.apply(null,weekClips.map(function(c){return c.viral_score||0}));
+        bestScoreEl.textContent=bestScore;
+        var percentile=Math.round((bestScore/100)*100);
+        var topPercent=100-percentile;
+        topPercent=Math.max(1,Math.min(49,topPercent));
+        if(bestPercentEl)bestPercentEl.textContent='Top '+topPercent+'% of clips';
+      } else if(clips.length>0){
+        var bestScore=Math.max.apply(null,clips.map(function(c){return c.viral_score||0}));
+        bestScoreEl.textContent=bestScore;
+        if(bestPercentEl)bestPercentEl.textContent='All time best';
+      } else {
+        bestScoreEl.textContent='-';
+        if(bestPercentEl)bestPercentEl.textContent='No clips yet';
+      }
+    }
   }catch(e){
     document.getElementById('scp').textContent='0';
     var weekEl=document.getElementById('scp-week');
