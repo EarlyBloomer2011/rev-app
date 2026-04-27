@@ -355,13 +355,14 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         <div class="sc am"><div class="scl">Best Score</div><div class="scv am">98</div><div class="scd">Top 2% of clips</div></div>
       </div>
       <div class="shdr">
-        <div class="stitle">&#9889; Generated Clips <span class="sbadge">3 Ready to Post</span></div>
-        <div style="font-size:12px;color:var(--muted);cursor:pointer">View All &#8594;</div>
+        <div class="stitle">&#9889; Generated Clips <span class="sbadge" id="dash-badge" style="display:none">Ready to Post</span></div>
       </div>
       <div class="cgrid" id="dc">
-        <div class="cc"><div class="ct t1"><div class="csc sh">98/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">Insane 1v5 clutch that ended the entire lobby</div><div class="cm"><span class="cv">4,821 views</span><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div></div>
-        <div class="cc"><div class="ct t2"><div class="csc sh">91/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">Chat goes absolutely wild at this moment</div><div class="cm"><span class="cv">2,340 views</span><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div></div>
-        <div class="cc"><div class="ct t3"><div class="csc sm">74/100</div><div class="cpl">&#9654;</div></div><div class="cb"><div class="ctl">How I set up my stream for growth</div><div class="cm"><span class="cv">1,100 views</span><div class="cbs"><button class="cbtn post">Post</button><button class="cbtn edit" onclick="openEditor()">Edit</button></div></div></div></div>
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:12px">&#127916;</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--muted);margin-bottom:6px">No clips generated today</div>
+          <div style="font-size:13px">Paste a YouTube link above to find your best moments</div>
+        </div>
       </div>
     </div>
     <div class="sp" id="sp-clips">
@@ -729,26 +730,45 @@ document.addEventListener('click',function(e){if(!e.target.closest('.nav-right')
 
 function showSub(id,el){document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');var ca=document.getElementById('ca'),coach=document.getElementById('sp-coach'),editor=document.getElementById('sp-editor');document.querySelectorAll('.sp').forEach(function(s){s.classList.remove('on')});coach.classList.remove('on');editor.classList.remove('on');editor.style.display='none';coach.style.display='none';ca.style.display='';if(id==='coach'){ca.style.display='none';coach.style.display='flex';coach.classList.add('on')}else if(id==='editor'){ca.style.display='none';editor.style.display='flex';editor.classList.add('on')}else{ca.style.display='';document.getElementById('sp-'+id).classList.add('on');ca.scrollTop=0;if(id==='clips')loadSavedClips()}}
 
+var allClipsCache=[];
+var clipsShowing=6;
+
+function renderClipsGrid(clips,count){
+  var grid=document.getElementById('saved-clips-grid');
+  var colors=['t1','t2','t3'];
+  var showing=clips.slice(0,count);
+  var html=showing.map(function(clip,i){
+    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
+  }).join('');
+  if(clips.length>count){
+    var nextCount=count===6?20:clips.length;
+    var label=count===6?'Show More ('+Math.min(20,clips.length)+')':'Show All ('+clips.length+')';
+    html+='<div style="grid-column:1/-1;text-align:center;padding:16px"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
+  }
+  grid.innerHTML=html;
+}
+
 async function loadSavedClips(filterType){
   if(!filterType)filterType='ai';
+  clipsShowing=6;
   var grid=document.getElementById('saved-clips-grid');
   if(!grid)return;
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Loading...</div>';
+  var bc=document.getElementById('best-clip-card');
+  if(bc)bc.style.display='none';
   try{
     var uid=currentUser?currentUser.id:null;
     if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
     if(!uid){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Log in to see saved clips</div>';return}
     var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:filterType})});
     var rd=await res.json();
-    if(!rd.success||!rd.clips||rd.clips.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No saved clips yet. Generate some clips first!</div>';return}
-    var clips=rd.clips;
+    if(!rd.success||!rd.clips||rd.clips.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No clips here yet!</div>';return}
+    var clips=rd.clips.filter(function(c){return filterType==='ai'?c.clip_type==='ai':c.clip_type!=='ai'});
+    if(clips.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No clips here yet!</div>';return}
+    allClipsCache=clips;
     var best=clips[0];
-    var bc=document.getElementById('best-clip-card');
     if(bc){bc.style.display='block';document.getElementById('best-clip-title').textContent=best.clip_title;document.getElementById('best-clip-pip').textContent=best.viral_score+'/100';document.getElementById('best-clip-score').textContent='\uD83D\uDD25 '+best.viral_score+'/100';document.getElementById('best-clip-time').textContent=best.timestamp_start+' - '+best.timestamp_end+' \u2022 '+best.video_title;document.getElementById('best-clip-watch').href=best.youtube_url||'#';document.getElementById('best-clip-studio').href=best.studio_url||'#';}
-    var colors=['t1','t2','t3'];
-    grid.innerHTML=clips.map(function(clip,i){
-      return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
-    }).join('');
+    renderClipsGrid(clips,6);
   }catch(e){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:#f87171">Could not load clips</div>'}
 }
 
@@ -791,10 +811,11 @@ async function generateClips(){
     var res=await fetch(BACKEND_URL+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})});
     var data=await res.json();
     if(!data.success)throw new Error(data.error||'Something went wrong');
+    var bgs=['linear-gradient(135deg,#1a0f3c,#2d1b69,#0f1f3d)','linear-gradient(135deg,#0f2a1f,#1a4a32,#0d1f15)','linear-gradient(135deg,#2a1209,#4a2010,#1a0b05)'];
     cr.innerHTML=data.clips.map(function(clip,i){
-      var bgs=['linear-gradient(135deg,#1a0f3c,#2d1b69,#0f1f3d)','linear-gradient(135deg,#0f2a1f,#1a4a32,#0d1f15)','linear-gradient(135deg,#2a1209,#4a2010,#1a0b05)'];
       return '<div class="cc"><div class="ct" style="background:'+bgs[i%3]+';flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.timestamp+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.end_timestamp+'</div></div><div class="cb"><div class="ctl">'+clip.title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.4">'+clip.reason+'</div><div class="cm"><span class="cv">'+clip.timestamp+' - '+clip.end_timestamp+'</span><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><a href="'+clip.studio_url+'" target="_blank"><button class="cbtn edit">&#9986; Clip</button></a></div></div></div></div>';
     }).join('');
+    var badge=document.getElementById('dash-badge');if(badge){badge.style.display='';badge.textContent=data.clips.length+' Ready to Post';}
     btn.textContent='\u2705 Done!';
     try{
       var uid=currentUser?currentUser.id:null;
