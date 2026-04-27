@@ -743,7 +743,10 @@ function renderClipsGrid(clips,count){
   if(clips.length>count){
     var nextCount=count===6?20:clips.length;
     var label=count===6?'Show More':'Show All';
-    html+='<div style="grid-column:1/-1;text-align:center;padding:16px"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
+    html+='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
+  }
+  if(count>6){
+    html+='<div style="grid-column:1/-1;text-align:center;padding-bottom:16px"><button onclick="renderClipsGrid(allClipsCache,6)" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Show Less &#9650;</button></div>';
   }
   grid.innerHTML=html;
 }
