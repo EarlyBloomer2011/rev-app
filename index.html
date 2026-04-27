@@ -341,7 +341,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
   <div class="content" id="ca">
     <div class="sp on" id="sp-dash">
       <div class="dhero">
-        <h2 id="welcome-msg">Welcome back, Jake &#128075;</h2>
+        <h2 id="welcome-msg">Welcome back &#128075;</h2>
         <p>Drop a video link below - AI finds your best moments and turns them into viral clips automatically</p>
         <div class="urow">
           <input class="uinp" type="text" id="yt-url" placeholder="Paste YouTube VOD link..."/>
@@ -486,64 +486,20 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
     <div class="modal-body">
       <div class="setting-section">
         <div class="setting-label">Account</div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Display Name</div><div class="setting-desc">This is shown on your profile</div></div>
-          <div class="setting-action" style="display:flex;gap:8px;align-items:center">
-            <input class="sfield" type="text" id="set-name" placeholder="Your name"/>
-            <button class="sbtn-sm primary" onclick="saveName()">Save</button>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Profile Picture</div><div class="setting-desc">Upload a photo for your profile</div></div>
-          <div class="setting-action" style="display:flex;gap:8px;align-items:center">
-            <div id="pfp-preview" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#4f9cf9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;overflow:hidden;flex-shrink:0">JD</div>
-            <input type="file" id="pfp-input" accept="image/*" style="display:none" onchange="previewPFP(this)"/>
-            <button class="sbtn-sm ghost" onclick="document.getElementById('pfp-input').click()">Upload</button>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Email Address</div><div class="setting-desc" id="set-email-desc">your@email.com</div></div>
-          <div class="setting-action" style="display:flex;gap:8px;align-items:center">
-            <input class="sfield" type="email" id="set-email" placeholder="New email"/>
-            <button class="sbtn-sm primary" onclick="saveEmail()">Update</button>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Switch Account</div><div class="setting-desc">Sign in to a different account</div></div>
-          <div class="setting-action"><button class="sbtn-sm ghost" onclick="openSwitchModal()">Switch</button></div>
-        </div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Display Name</div><div class="setting-desc">This is shown on your profile</div></div><div class="setting-action" style="display:flex;gap:8px;align-items:center"><input class="sfield" type="text" id="set-name" placeholder="Your name"/><button class="sbtn-sm primary" onclick="saveName()">Save</button></div></div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Profile Picture</div><div class="setting-desc">Upload a photo for your profile</div></div><div class="setting-action" style="display:flex;gap:8px;align-items:center"><div id="pfp-preview" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#4f9cf9);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;overflow:hidden;flex-shrink:0">JD</div><input type="file" id="pfp-input" accept="image/*" style="display:none" onchange="previewPFP(this)"/><button class="sbtn-sm ghost" onclick="document.getElementById('pfp-input').click()">Upload</button></div></div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Email Address</div><div class="setting-desc" id="set-email-desc">your@email.com</div></div><div class="setting-action" style="display:flex;gap:8px;align-items:center"><input class="sfield" type="email" id="set-email" placeholder="New email"/><button class="sbtn-sm primary" onclick="saveEmail()">Update</button></div></div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Switch Account</div><div class="setting-desc">Sign in to a different account</div></div><div class="setting-action"><button class="sbtn-sm ghost" onclick="openSwitchModal()">Switch</button></div></div>
       </div>
       <div class="setting-section">
         <div class="setting-label">Appearance</div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Highlights</div><div class="setting-desc">Turn off to remove glows and colour effects</div></div>
-          <div class="setting-action"><button class="toggle-sm on" id="dark-mode-tog" onclick="toggleDarkMode(this)"></button></div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Language</div><div class="setting-desc">Choose your preferred language</div></div>
-          <div class="setting-action">
-            <select class="select-field" id="lang-select" onchange="saveLanguage(this.value)">
-              <option value="en">&#127482;&#127480; English</option>
-              <option value="es">&#127466;&#127480; Spanish</option>
-              <option value="fr">&#127467;&#127479; French</option>
-              <option value="de">&#127465;&#127466; German</option>
-              <option value="pt">&#127477;&#127481; Portuguese</option>
-              <option value="ja">&#127471;&#127477; Japanese</option>
-              <option value="ko">&#127472;&#127479; Korean</option>
-            </select>
-          </div>
-        </div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Highlights</div><div class="setting-desc">Turn off to remove glows and colour effects</div></div><div class="setting-action"><button class="toggle-sm on" id="dark-mode-tog" onclick="toggleDarkMode(this)"></button></div></div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Language</div><div class="setting-desc">Choose your preferred language</div></div><div class="setting-action"><select class="select-field" id="lang-select" onchange="saveLanguage(this.value)"><option value="en">&#127482;&#127480; English</option><option value="es">&#127466;&#127480; Spanish</option><option value="fr">&#127467;&#127479; French</option><option value="de">&#127465;&#127466; German</option><option value="pt">&#127477;&#127481; Portuguese</option><option value="ja">&#127471;&#127477; Japanese</option><option value="ko">&#127472;&#127479; Korean</option></select></div></div>
       </div>
       <div class="setting-section">
         <div class="setting-label">Subscription</div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Current Plan</div><div class="setting-desc">You are on the <span style="color:#c4b5fd;font-weight:500">Free Plan</span></div></div>
-          <div class="setting-action"><button class="sbtn-sm primary">&#9889; Upgrade to Pro</button></div>
-        </div>
-        <div class="setting-row">
-          <div class="setting-info"><div class="setting-name">Cancel Subscription</div><div class="setting-desc">This will downgrade you to the free plan</div></div>
-          <div class="setting-action"><button class="sbtn-sm danger" onclick="alert('Available once Pro plan is set up.')">Cancel</button></div>
-        </div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Current Plan</div><div class="setting-desc">You are on the <span style="color:#c4b5fd;font-weight:500">Free Plan</span></div></div><div class="setting-action"><button class="sbtn-sm primary">&#9889; Upgrade to Pro</button></div></div>
+        <div class="setting-row"><div class="setting-info"><div class="setting-name">Cancel Subscription</div><div class="setting-desc">This will downgrade you to the free plan</div></div><div class="setting-action"><button class="sbtn-sm danger" onclick="alert('Available once Pro plan is set up.')">Cancel</button></div></div>
       </div>
     </div>
   </div>
@@ -554,10 +510,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
     <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px">Switch Account</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Sign in to a different account</div>
     <input class="gf" type="email" id="sw-em" placeholder="Email address"/>
-    <div style="position:relative;margin-bottom:10px">
-      <input class="gf" type="password" id="sw-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doSwitch()" style="margin-bottom:0;padding-right:42px"/>
-      <button type="button" onclick="var i=document.getElementById('sw-pw');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--hint);font-size:15px;padding:0">&#128065;</button>
-    </div>
+    <div style="position:relative;margin-bottom:10px"><input class="gf" type="password" id="sw-pw" placeholder="Password" onkeydown="if(event.key==='Enter')doSwitch()" style="margin-bottom:0;padding-right:42px"/><button type="button" onclick="var i=document.getElementById('sw-pw');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--hint);font-size:15px;padding:0">&#128065;</button></div>
     <div style="color:#f87171;font-size:12px;min-height:18px;margin-bottom:8px" id="sw-err"></div>
     <button class="btn-li" id="sw-btn" onclick="doSwitch()">Switch Account</button>
     <div class="llinks" style="margin-top:12px"><span onclick="closeSwitchModal()">Cancel</span></div>
@@ -572,11 +525,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
       <div class="cropper-overlay"><div class="cropper-circle"></div></div>
       <div id="crop-tap-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5"><button onclick="loadCropImage()" style="background:rgba(124,92,252,0.85);border:1px solid rgba(124,92,252,0.6);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Tap to load image</button></div>
     </div>
-    <div class="cropper-zoom">
-      <span>&#128269;</span>
-      <input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/>
-      <span>&#128270;</span>
-    </div>
+    <div class="cropper-zoom"><span>&#128269;</span><input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/><span>&#128270;</span></div>
     <div class="cropper-actions">
       <button onclick="closeCropper()" style="background:transparent;color:var(--muted);border-color:var(--border2)">Cancel</button>
       <button onclick="applyCrop()" style="background:linear-gradient(135deg,#7c5cfc,#4f9cf9);color:white;border:none;box-shadow:0 0 12px rgba(124,92,252,0.3)">Apply</button>
@@ -586,34 +535,22 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 
 <div class="profile-bg" id="profile-modal">
   <div class="profile-modal">
-    <div class="modal-header">
-      <div class="modal-title">&#128100; Profile</div>
-      <button class="modal-close" onclick="closeProfile()">&#10005;</button>
-    </div>
+    <div class="modal-header"><div class="modal-title">&#128100; Profile</div><button class="modal-close" onclick="closeProfile()">&#10005;</button></div>
     <div class="modal-body">
       <div style="text-align:center;margin-bottom:24px">
         <div id="profile-av-display" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#4f9cf9);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:white;margin:0 auto 12px;box-shadow:0 0 24px rgba(124,92,252,0.4);overflow:hidden">G</div>
-        <div id="profile-name-display" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">Gavin</div>
+        <div id="profile-name-display" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">User</div>
         <div id="profile-email-display" style="font-size:12px;color:var(--muted);margin-top:4px">your@email.com</div>
       </div>
-      <div class="av-section">
-        <div class="av-section-title">Upload your own photo</div>
-        <input type="file" id="profile-pfp-input" accept="image/*" style="display:none" onchange="profileUploadPFP(this)"/>
-        <button class="sbtn-sm primary" style="width:100%" onclick="document.getElementById('profile-pfp-input').click()">&#128247; Upload Photo</button>
-      </div>
-      <div class="av-section">
-        <div class="av-section-title">Plain colours</div>
-        <div class="avatar-grid" id="plain-avatars"></div>
-      </div>
-      <div class="av-section">
-        <div class="av-section-title">Cool gradients</div>
-        <div class="avatar-grid" id="gradient-avatars"></div>
-      </div>
+      <div class="av-section"><div class="av-section-title">Upload your own photo</div><input type="file" id="profile-pfp-input" accept="image/*" style="display:none" onchange="profileUploadPFP(this)"/><button class="sbtn-sm primary" style="width:100%" onclick="document.getElementById('profile-pfp-input').click()">&#128247; Upload Photo</button></div>
+      <div class="av-section"><div class="av-section-title">Plain colours</div><div class="avatar-grid" id="plain-avatars"></div></div>
+      <div class="av-section"><div class="av-section-title">Cool gradients</div><div class="avatar-grid" id="gradient-avatars"></div></div>
     </div>
   </div>
 </div>
 
 <script>
+var BACKEND_URL='https://rev-backend-9ubw.onrender.com';
 var sb;
 var currentUser=null;
 window.addEventListener('load',function(){
@@ -647,15 +584,15 @@ function setUserUI(user){
     if(aurl.indexOf('|plain')>-1||aurl.indexOf('|gradient')>-1){
       var color=aurl.split('|')[0];
       html='<div style="width:100%;height:100%;background:'+color+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">'+firstName[0].toUpperCase()+'</div>';
-    } else if(aurl.indexOf('|emoji|')>-1){
+    }else if(aurl.indexOf('|emoji|')>-1){
       var parts=aurl.split('|emoji|');
       html='<div style="width:100%;height:100%;background:'+parts[0]+';display:flex;align-items:center;justify-content:center;font-size:16px">'+parts[1]+'</div>';
-    } else {
+    }else{
       html='<img src="'+aurl+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>';
     }
     if(av)av.innerHTML=html;
     if(pfp)pfp.innerHTML=html;
-  } else {
+  }else{
     var initial=firstName[0].toUpperCase();
     if(av){av.innerHTML='';av.textContent=initial}
     if(pfp){pfp.innerHTML='';pfp.textContent=initial}
@@ -663,6 +600,8 @@ function setUserUI(user){
   var tog=document.getElementById('dark-mode-tog');
   if(tog){var h=meta.highlights!==false;tog.className='toggle-sm '+(h?'on':'off');applyHighlights(h)}
   if(meta.language){var sel=document.getElementById('lang-select');if(sel)sel.value=meta.language}
+  document.getElementById('profile-name-display').textContent=firstName;
+  document.getElementById('profile-email-display').textContent=user.email;
 }
 
 function applyHighlights(on){
@@ -673,7 +612,7 @@ function applyHighlights(on){
     document.querySelectorAll('.rev-logo').forEach(function(el){el.style.filter='drop-shadow(0 0 24px rgba(139,92,246,0.7))'});
     document.querySelectorAll('.bcard').forEach(function(el){el.style.animation='';el.style.boxShadow=''});
     document.querySelectorAll('.btn-gen').forEach(function(el){el.style.boxShadow='0 0 20px rgba(124,92,252,0.4)'});
-  } else {
+  }else{
     document.documentElement.style.setProperty('--p','#5a3fc0');
     document.documentElement.style.setProperty('--b','#3a7bd5');
     document.documentElement.style.setProperty('--g','#1a9e5e');
@@ -685,18 +624,7 @@ function applyHighlights(on){
   }
 }
 
-// PROFILE
-function openProfile(){
-  document.getElementById('profile-modal').classList.add('open');
-  document.getElementById('dd').style.display='none';
-  var av=document.querySelector('.av');
-  var pavd=document.getElementById('profile-av-display');
-  if(av&&pavd){if(av.innerHTML)pavd.innerHTML=av.innerHTML;else pavd.textContent=av.textContent}
-  var wm=document.getElementById('welcome-msg');
-  if(wm){var n=wm.textContent.replace('Welcome back, ','').replace(' \uD83D\uDC4B','').trim();document.getElementById('profile-name-display').textContent=n}
-  document.getElementById('profile-email-display').textContent=document.getElementById('set-email-desc').textContent;
-  buildPlainAvatars();buildGradientAvatars();
-}
+function openProfile(){document.getElementById('profile-modal').classList.add('open');document.getElementById('dd').style.display='none';buildPlainAvatars();buildGradientAvatars();}
 function closeProfile(){document.getElementById('profile-modal').classList.remove('open')}
 function buildPlainAvatars(){
   var colors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#607d8b','#795548'];
@@ -710,44 +638,15 @@ function buildGradientAvatars(){
   var initial=document.getElementById('profile-name-display').textContent.trim()[0]||'G';
   grid.innerHTML=grads.map(function(g){return '<div class="av-opt" style="background:'+g+'" onclick="setAvatarGrad(\''+g.replace(/'/g,'"')+'\')">'+initial+'</div>'}).join('');
 }
-function setAvatarPlain(color){
-  var initial=document.getElementById('profile-name-display').textContent.trim()[0]||'G';
-  var html='<div style="width:100%;height:100%;background:'+color+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">'+initial+'</div>';
-  applyAvatar(html,color+'|plain');
-}
-function setAvatarGrad(grad){
-  var initial=document.getElementById('profile-name-display').textContent.trim()[0]||'G';
-  var html='<div style="width:100%;height:100%;background:'+grad+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">'+initial+'</div>';
-  applyAvatar(html,grad+'|gradient');
-}
-function applyAvatar(html,dataUrl){
-  document.getElementById('profile-av-display').innerHTML=html;
-  var av=document.querySelector('.av');if(av)av.innerHTML=html;
-  var pfp=document.getElementById('pfp-preview');if(pfp)pfp.innerHTML=html;
-  sb.auth.updateUser({data:{avatar_url:dataUrl}}).catch(function(){});
-  showSettingsSaved('Avatar updated!');
-}
-function profileUploadPFP(input){
-  if(!input.files||!input.files[0])return;
-  pendingCropUrl=URL.createObjectURL(input.files[0]);
-  cropX=0;cropY=0;cropZoom=1;
-  document.getElementById('cropper-zoom').value=1;
-  document.getElementById('cropper-img').src='';
-  document.getElementById('crop-tap-hint').style.display='flex';
-  document.getElementById('cropper-bg').classList.add('open');
-}
+function setAvatarPlain(color){var initial=document.getElementById('profile-name-display').textContent.trim()[0]||'G';var html='<div style="width:100%;height:100%;background:'+color+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">'+initial+'</div>';applyAvatar(html,color+'|plain');}
+function setAvatarGrad(grad){var initial=document.getElementById('profile-name-display').textContent.trim()[0]||'G';var html='<div style="width:100%;height:100%;background:'+grad+';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">'+initial+'</div>';applyAvatar(html,grad+'|gradient');}
+function applyAvatar(html,dataUrl){document.getElementById('profile-av-display').innerHTML=html;var av=document.querySelector('.av');if(av)av.innerHTML=html;var pfp=document.getElementById('pfp-preview');if(pfp)pfp.innerHTML=html;sb.auth.updateUser({data:{avatar_url:dataUrl}}).catch(function(){});showSettingsSaved('Avatar updated!');}
+function profileUploadPFP(input){if(!input.files||!input.files[0])return;pendingCropUrl=URL.createObjectURL(input.files[0]);cropX=0;cropY=0;cropZoom=1;document.getElementById('cropper-zoom').value=1;document.getElementById('cropper-img').src='';document.getElementById('crop-tap-hint').style.display='flex';document.getElementById('cropper-bg').classList.add('open');}
 
-// SETTINGS
 function openSettings(){document.getElementById('settings-modal').classList.add('open');document.getElementById('dd').style.display='none'}
 function closeSettings(){document.getElementById('settings-modal').classList.remove('open')}
-async function toggleDarkMode(btn){
-  btn.classList.toggle('on');btn.classList.toggle('off');
-  var on=btn.classList.contains('on');
-  applyHighlights(on);
-  try{await sb.auth.updateUser({data:{highlights:on}})}catch(e){}
-}
+async function toggleDarkMode(btn){btn.classList.toggle('on');btn.classList.toggle('off');var on=btn.classList.contains('on');applyHighlights(on);try{await sb.auth.updateUser({data:{highlights:on}})}catch(e){}}
 
-// SWITCH ACCOUNT
 function openSwitchModal(){document.getElementById('sw-em').value='';document.getElementById('sw-pw').value='';document.getElementById('sw-err').textContent='';document.getElementById('sw-btn').textContent='Switch Account';document.getElementById('sw-btn').disabled=false;closeSettings();document.getElementById('switch-bg').classList.add('open')}
 function closeSwitchModal(){document.getElementById('switch-bg').classList.remove('open')}
 async function doSwitch(){
@@ -772,7 +671,6 @@ async function doSwitch(){
   }
 }
 
-// CROPPER
 var cropX=0,cropY=0,cropZoom=1,cropDragging=false,cropLastX=0,cropLastY=0,pendingCropUrl='';
 function previewPFP(input){if(!input.files||!input.files[0])return;pendingCropUrl=URL.createObjectURL(input.files[0]);cropX=0;cropY=0;cropZoom=1;document.getElementById('cropper-zoom').value=1;document.getElementById('cropper-img').src='';document.getElementById('crop-tap-hint').style.display='flex';document.getElementById('cropper-bg').classList.add('open')}
 function loadCropImage(){var hint=document.getElementById('crop-tap-hint');hint.style.display='none';var img=document.getElementById('cropper-img');var wrap=document.getElementById('cropper-wrap');var tmpImg=new Image();tmpImg.onload=function(){var ww=wrap.offsetWidth||280,wh=wrap.offsetHeight||280;var scale=Math.max(ww/tmpImg.width,wh/tmpImg.height);img.style.width=(tmpImg.width*scale)+'px';img.style.height=(tmpImg.height*scale)+'px';img.onload=function(){updateCropPos()};img.src=pendingCropUrl};tmpImg.src=pendingCropUrl}
@@ -808,7 +706,6 @@ async function saveEmail(){var email=document.getElementById('set-email').value.
 async function saveLanguage(val){try{await sb.auth.updateUser({data:{language:val}})}catch(e){}showSettingsSaved('Language saved!')}
 function showSettingsSaved(msg){var ex=document.getElementById('settings-saved');if(ex)ex.remove();var el=document.createElement('div');el.id='settings-saved';el.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c5cfc,#4f9cf9);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:400;box-shadow:0 0 20px rgba(124,92,252,0.4)';el.textContent='\u2705 '+msg;document.body.appendChild(el);setTimeout(function(){el.remove()},2500)}
 
-// AUTH
 function showReset(){document.getElementById('lcard-login').style.display='none';document.getElementById('lcard-reset').style.display='block';document.getElementById('reset-err').textContent='';document.getElementById('reset-em').value=''}
 function showLogin(){document.getElementById('lcard-reset').style.display='none';document.getElementById('lcard-signup').style.display='none';document.getElementById('lcard-login').style.display='block'}
 async function doReset(){var em=document.getElementById('reset-em').value.trim();var err=document.getElementById('reset-err');var btn=document.querySelector('#lcard-reset .btn-li');if(!em){err.textContent='Please enter your email';return}err.textContent='';btn.textContent='Sending...';btn.disabled=true;try{var r=await sb.auth.resetPasswordForEmail(em);if(r.error)throw r.error;err.style.color='#4de89a';err.textContent='Reset link sent! Check your email.';btn.textContent='Sent!'}catch(e){err.style.color='#f87171';err.textContent=e.message;btn.textContent='Send Reset Link';btn.disabled=false}}
@@ -819,17 +716,17 @@ async function doLogin(){
   try{
     var r=await sb.auth.signInWithPassword({email:em,password:pw});
     if(r.error){document.getElementById('li-err').textContent='Wrong email or password';return}
+    currentUser=r.data.user;
     setUserUI(r.data.user);
     document.getElementById('pg-login').classList.remove('active');
     document.getElementById('pg-app').classList.add('active');
     showSub('dash',document.querySelectorAll('.ntab')[0]);
   }catch(e){document.getElementById('li-err').textContent='Login failed. Try again.'}
 }
-function doLogout(){document.getElementById('pg-app').classList.remove('active');document.getElementById('pg-login').classList.add('active');document.getElementById('dd').style.display='none';document.getElementById('li-err').textContent='';document.getElementById('em').value='';document.getElementById('pw').value='';sb.auth.signOut()}
+function doLogout(){document.getElementById('pg-app').classList.remove('active');document.getElementById('pg-login').classList.add('active');document.getElementById('dd').style.display='none';document.getElementById('li-err').textContent='';document.getElementById('em').value='';document.getElementById('pw').value='';currentUser=null;sb.auth.signOut()}
 function toggleDD(){var d=document.getElementById('dd');d.style.display=d.style.display==='none'?'block':'none'}
 document.addEventListener('click',function(e){if(!e.target.closest('.nav-right'))document.getElementById('dd').style.display='none'});
 
-// NAV
 function showSub(id,el){document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on')});el.classList.add('on');var ca=document.getElementById('ca'),coach=document.getElementById('sp-coach'),editor=document.getElementById('sp-editor');document.querySelectorAll('.sp').forEach(function(s){s.classList.remove('on')});coach.classList.remove('on');editor.classList.remove('on');editor.style.display='none';coach.style.display='none';ca.style.display='';if(id==='coach'){ca.style.display='none';coach.style.display='flex';coach.classList.add('on')}else if(id==='editor'){ca.style.display='none';editor.style.display='flex';editor.classList.add('on')}else{ca.style.display='';document.getElementById('sp-'+id).classList.add('on');ca.scrollTop=0;if(id==='clips')loadSavedClips()}}
 
 async function loadSavedClips(filterType){
@@ -839,41 +736,27 @@ async function loadSavedClips(filterType){
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Loading...</div>';
   try{
     var uid=currentUser?currentUser.id:null;
+    if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
     if(!uid){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">Log in to see saved clips</div>';return}
-   var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:filterType})});
+    var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:filterType})});
     var rd=await res.json();
     if(!rd.success||!rd.clips||rd.clips.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted)">No saved clips yet. Generate some clips first!</div>';return}
-    var clips=rd.clips;var best=clips[0];var bc=document.getElementById('best-clip-card');if(bc){bc.style.display='block';document.getElementById('best-clip-title').textContent=best.clip_title;document.getElementById('best-clip-pip').textContent=best.viral_score+'/100';document.getElementById('best-clip-score').textContent='\uD83D\uDD25 '+best.viral_score+'/100';document.getElementById('best-clip-time').textContent=best.timestamp_start+' - '+best.timestamp_end+' \u2022 '+best.video_title;document.getElementById('best-clip-watch').href=best.youtube_url||'#';document.getElementById('best-clip-studio').href=best.studio_url||'#';}
+    var clips=rd.clips;
+    var best=clips[0];
+    var bc=document.getElementById('best-clip-card');
+    if(bc){bc.style.display='block';document.getElementById('best-clip-title').textContent=best.clip_title;document.getElementById('best-clip-pip').textContent=best.viral_score+'/100';document.getElementById('best-clip-score').textContent='\uD83D\uDD25 '+best.viral_score+'/100';document.getElementById('best-clip-time').textContent=best.timestamp_start+' - '+best.timestamp_end+' \u2022 '+best.video_title;document.getElementById('best-clip-watch').href=best.youtube_url||'#';document.getElementById('best-clip-studio').href=best.studio_url||'#';}
+    var colors=['t1','t2','t3'];
     grid.innerHTML=clips.map(function(clip,i){
       return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
     }).join('');
   }catch(e){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:20px;color:#f87171">Could not load clips</div>'}
 }
 
-function toggleClipsFilter(){
-  var dd=document.getElementById('clips-filter-dd');
-  dd.style.display=dd.style.display==='none'?'block':'none';
-}
-function setClipsFilter(type){
-  document.getElementById('clips-filter-dd').style.display='none';
-  document.getElementById('filter-ai').style.color=type==='ai'?'#c4b5fd':'var(--muted)';
-  document.getElementById('filter-ai').style.background=type==='ai'?'rgba(124,92,252,0.15)':'transparent';
-  document.getElementById('filter-manual').style.color=type==='manual'?'#c4b5fd':'var(--muted)';
-  document.getElementById('filter-manual').style.background=type==='manual'?'rgba(124,92,252,0.15)':'transparent';
-  document.getElementById('clips-filter-label').textContent=type==='ai'?'AI Clips':'Clips I Made';
-  loadSavedClips(type);
-}
-document.addEventListener('click',function(e){
-  var dd=document.getElementById('clips-filter-dd');
-  if(dd&&!e.target.closest('#clips-filter-dd')&&!e.target.closest('[onclick="toggleClipsFilter()"]'))dd.style.display='none';
-});
-async function deleteClip(id,btn){
-  if(!confirm('Delete this clip?'))return;
-  await fetch(BACKEND_URL+'/api/delete-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});
-  loadSavedClips();
-}
+function toggleClipsFilter(){var dd=document.getElementById('clips-filter-dd');dd.style.display=dd.style.display==='none'?'block':'none';}
+function setClipsFilter(type){document.getElementById('clips-filter-dd').style.display='none';document.getElementById('filter-ai').style.color=type==='ai'?'#c4b5fd':'var(--muted)';document.getElementById('filter-ai').style.background=type==='ai'?'rgba(124,92,252,0.15)':'transparent';document.getElementById('filter-manual').style.color=type==='manual'?'#c4b5fd':'var(--muted)';document.getElementById('filter-manual').style.background=type==='manual'?'rgba(124,92,252,0.15)':'transparent';document.getElementById('clips-filter-label').textContent=type==='ai'?'AI Clips':'Clips I Made';loadSavedClips(type);}
+document.addEventListener('click',function(e){var dd=document.getElementById('clips-filter-dd');if(dd&&!e.target.closest('#clips-filter-dd')&&!e.target.closest('[onclick="toggleClipsFilter()"]'))dd.style.display='none';});
+async function deleteClip(id,btn){if(!confirm('Delete this clip?'))return;await fetch(BACKEND_URL+'/api/delete-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});loadSavedClips();}
 
-// EDITOR
 function openEditor(){showSub('editor',document.querySelectorAll('.ntab')[2])}
 function switchPanel(n){['ai','captions','sounds','style'].forEach(function(p){var el=document.getElementById('panel-'+p);if(el)el.style.display=p===n?'block':'none'});document.querySelectorAll('.ptab').forEach(function(t,i){t.classList.toggle('on',['ai','captions','sounds','style'][i]===n)})}
 function toggleSug(btn,id){btn.classList.toggle('on');btn.classList.toggle('off');var b=document.getElementById(id);if(b)b.style.display=btn.classList.contains('on')?'':'none'}
@@ -891,14 +774,11 @@ function scrub(e){progress=Math.max(0,Math.min(100,(e.offsetX/e.currentTarget.of
 function edUndo(){document.querySelectorAll('.tog').forEach(function(t){t.classList.remove('on');t.classList.add('off')});document.getElementById('pzb').style.display='none';document.getElementById('psb').style.display='none';document.getElementById('capd').style.display='none'}
 function edExport(){var btn=document.querySelector('.ebtn.gr'),orig=btn.textContent;btn.textContent='\u23F3 Exporting...';btn.style.opacity='0.7';setTimeout(function(){btn.textContent='\u2705 Exported!';setTimeout(function(){btn.textContent=orig;btn.style.opacity='1'},2000)},2000)}
 
-// AI COACH
 var chatHistory=[];
 function escH(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function fmtAI(t){t=t.replace(/\*\*(.*?)\*\*/g,"<b style='color:#c4b5fd'>$1</b>");t=t.replace(/\n/g,'<br>');return t}
 async function sendMsg(){var inp=document.getElementById('ci'),text=inp.value.trim();if(!text)return;var msgs=document.getElementById('msgs');msgs.innerHTML+='<div class="mrow u"><div class="mav user">ME</div><div class="bubble user">'+escH(text)+'</div></div>';inp.value='';inp.disabled=true;document.querySelector('.sbtn').disabled=true;chatHistory.push({role:'user',content:text});var tid='t'+Date.now();msgs.innerHTML+='<div class="mrow" id="'+tid+'"><div class="mav ai">\u26A1</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div></div>';msgs.scrollTop=msgs.scrollHeight;try{var res=await fetch(BACKEND_URL+'/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});var data=await res.json();var reply=data&&data.reply?data.reply:'Sorry, try again!';chatHistory.push({role:'assistant',content:reply});var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai">'+fmtAI(reply)+'</div></div>'}catch(e){var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai" style="color:#f87171">Connection error. Try again!</div></div>'}inp.disabled=false;document.querySelector('.sbtn').disabled=false;inp.focus();msgs.scrollTop=msgs.scrollHeight}
 
-// BACKEND
-var BACKEND_URL='https://rev-backend-9ubw.onrender.com';
 async function generateClips(){
   var input=document.getElementById('yt-url');
   var url=input?input.value.trim():'';
@@ -911,35 +791,18 @@ async function generateClips(){
     var res=await fetch(BACKEND_URL+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})});
     var data=await res.json();
     if(!data.success)throw new Error(data.error||'Something went wrong');
-    var colors=['t1','t2','t3'];
     cr.innerHTML=data.clips.map(function(clip,i){
       var bgs=['linear-gradient(135deg,#1a0f3c,#2d1b69,#0f1f3d)','linear-gradient(135deg,#0f2a1f,#1a4a32,#0d1f15)','linear-gradient(135deg,#2a1209,#4a2010,#1a0b05)'];
-      return'<div class="cc"><div class="ct" style="background:'+bgs[i%3]+';flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.timestamp+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.end_timestamp+'</div></div><div class="cb"><div class="ctl">'+clip.title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.4">'+clip.reason+'</div><div class="cm"><span class="cv">'+clip.timestamp+' - '+clip.end_timestamp+'</span><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><a href="'+clip.studio_url+'" target="_blank"><button class="cbtn edit">&#9986; Clip</button></a></div></div></div></div>';
+      return '<div class="cc"><div class="ct" style="background:'+bgs[i%3]+';flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.timestamp+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:22px;color:white;font-weight:800;letter-spacing:-0.5px">'+clip.end_timestamp+'</div></div><div class="cb"><div class="ctl">'+clip.title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.4">'+clip.reason+'</div><div class="cm"><span class="cv">'+clip.timestamp+' - '+clip.end_timestamp+'</span><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><a href="'+clip.studio_url+'" target="_blank"><button class="cbtn edit">&#9986; Clip</button></a></div></div></div></div>';
     }).join('');
     btn.textContent='\u2705 Done!';
-    // Save clips via Render backend
     try{
       var uid=currentUser?currentUser.id:null;
+      if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
       if(uid){
         for(var ci=0;ci<data.clips.length;ci++){
           var clip=data.clips[ci];
-          await fetch(BACKEND_URL+'/api/save-clip',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({
-              user_id:uid,
-              video_url:url,
-              video_title:data.video_title||'',
-              clip_title:clip.title,
-              timestamp_start:clip.timestamp,
-              timestamp_end:clip.end_timestamp,
-              viral_score:clip.viral_score,
-              reason:clip.reason||'',
-              youtube_url:clip.youtube_url,
-              studio_url:clip.studio_url||'',
-              clip_type:'ai'
-            })
-          });
+          await fetch(BACKEND_URL+'/api/save-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,video_url:url,video_title:data.video_title||'',clip_title:clip.title,timestamp_start:clip.timestamp,timestamp_end:clip.end_timestamp,viral_score:clip.viral_score,reason:clip.reason||'',youtube_url:clip.youtube_url,studio_url:clip.studio_url||'',clip_type:'ai'})});
         }
       }
     }catch(saveErr){console.log('Save error:',saveErr)}
