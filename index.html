@@ -349,7 +349,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         </div>
       </div>
       <div class="sg">
-        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">24</div><div class="scd">&#8593; 8 this week</div></div>
+        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">-</div><div class="scd" id="scp-week">Loading...</div></div>
         <div class="sc b"><div class="scl">Total Views</div><div class="scv b">14.2K</div><div class="scd">&#8593; 2.1K this week</div></div>
         <div class="sc g"><div class="scl">Followers Gained</div><div class="scv g">+312</div><div class="scd">&#8593; 48 this week</div></div>
         <div class="sc am"><div class="scl">Best Score</div><div class="scv am">98</div><div class="scd">Top 2% of clips</div></div>
@@ -722,6 +722,7 @@ async function doLogin(){
     document.getElementById('pg-login').classList.remove('active');
     document.getElementById('pg-app').classList.add('active');
     showSub('dash',document.querySelectorAll('.ntab')[0]);
+    loadDashStats();
   }catch(e){document.getElementById('li-err').textContent='Login failed. Try again.'}
 }
 function doLogout(){document.getElementById('pg-app').classList.remove('active');document.getElementById('pg-login').classList.add('active');document.getElementById('dd').style.display='none';document.getElementById('li-err').textContent='';document.getElementById('em').value='';document.getElementById('pw').value='';currentUser=null;sb.auth.signOut()}
@@ -805,6 +806,29 @@ function escH(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/
 function fmtAI(t){t=t.replace(/\*\*(.*?)\*\*/g,"<b style='color:#c4b5fd'>$1</b>");t=t.replace(/\n/g,'<br>');return t}
 async function sendMsg(){var inp=document.getElementById('ci'),text=inp.value.trim();if(!text)return;var msgs=document.getElementById('msgs');msgs.innerHTML+='<div class="mrow u"><div class="mav user">ME</div><div class="bubble user">'+escH(text)+'</div></div>';inp.value='';inp.disabled=true;document.querySelector('.sbtn').disabled=true;chatHistory.push({role:'user',content:text});var tid='t'+Date.now();msgs.innerHTML+='<div class="mrow" id="'+tid+'"><div class="mav ai">\u26A1</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div></div>';msgs.scrollTop=msgs.scrollHeight;try{var res=await fetch(BACKEND_URL+'/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});var data=await res.json();var reply=data&&data.reply?data.reply:'Sorry, try again!';chatHistory.push({role:'assistant',content:reply});var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai">'+fmtAI(reply)+'</div></div>'}catch(e){var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai" style="color:#f87171">Connection error. Try again!</div></div>'}inp.disabled=false;document.querySelector('.sbtn').disabled=false;inp.focus();msgs.scrollTop=msgs.scrollHeight}
 
+async function loadDashStats(){
+  try{
+    var uid=currentUser?currentUser.id:null;
+    if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
+    if(!uid)return;
+    var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:'ai'})});
+    var rd=await res.json();
+    if(!rd.success||!rd.clips)return;
+    var clips=rd.clips;
+    var total=clips.length;
+    document.getElementById('scp').textContent=total;
+    var now=Date.now();
+    var weekAgo=now-7*24*60*60*1000;
+    var thisWeek=clips.filter(function(c){return c.created_at&&new Date(c.created_at).getTime()>weekAgo}).length;
+    var weekEl=document.getElementById('scp-week');
+    if(weekEl)weekEl.textContent=thisWeek>0?'\u2191 '+thisWeek+' this week':'No new clips this week';
+  }catch(e){
+    document.getElementById('scp').textContent='0';
+    var weekEl=document.getElementById('scp-week');
+    if(weekEl)weekEl.textContent='No clips yet';
+  }
+}
+
 async function generateClips(){
   var input=document.getElementById('yt-url');
   var url=input?input.value.trim():'';
@@ -823,6 +847,7 @@ async function generateClips(){
     }).join('');
     var badge=document.getElementById('dash-badge');if(badge){badge.style.display='';badge.textContent=data.clips.length+' Ready to Post';}
     btn.textContent='\u2705 Done!';
+    loadDashStats();
     try{
       var uid=currentUser?currentUser.id:null;
       if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
