@@ -740,14 +740,17 @@ function renderClipsGrid(clips,count){
   var html=showing.map(function(clip,i){
     return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
   }).join('');
+  var btns='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center">';
   if(clips.length>count){
     var nextCount=count===6?20:clips.length;
     var label=count===6?'Show More':'Show All';
-    html+='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
+    btns+='<button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button>';
   }
   if(count>6){
-    html+='<div style="grid-column:1/-1;text-align:center;padding-bottom:16px"><button onclick="renderClipsGrid(allClipsCache,6)" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 20px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Show Less &#9650;</button></div>';
+    btns+='<button onclick="renderClipsGrid(allClipsCache,6)" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Show Less &#9650;</button>';
   }
+  btns+='</div>';
+  if(clips.length>count||count>6)html+=btns;
   grid.innerHTML=html;
 }
 
