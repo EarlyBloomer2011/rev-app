@@ -349,19 +349,19 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         </div>
       </div>
       <div class="sg">
-        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">24</div><div class="scd">&#8593; 8 this week</div></div>
+        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">-</div><div class="scd" id="scp-week">Loading...</div></div>
         <div class="sc b"><div class="scl">Total Views</div><div class="scv b">14.2K</div><div class="scd">&#8593; 2.1K this week</div></div>
         <div class="sc g"><div class="scl">Followers Gained</div><div class="scv g">+312</div><div class="scd">&#8593; 48 this week</div></div>
-        <div class="sc am"><div class="scl">Best Score</div><div class="scv am">98</div><div class="scd">Top 2% of clips</div></div>
+        <div class="sc am"><div class="scl">Best Score This Week</div><div class="scv am" id="dash-best-score">-</div><div class="scd" id="dash-best-percent">Loading...</div></div>
       </div>
       <div class="shdr">
         <div class="stitle">&#9889; Generated Clips <span class="sbadge" id="dash-badge" style="display:none">Ready to Post</span></div>
       </div>
       <div class="cgrid" id="dc">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
-          <div style="font-size:32px;margin-bottom:12px">&#127916;</div>
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--muted);margin-bottom:6px">No clips generated today</div>
-          <div style="font-size:13px">Paste a YouTube link above to find your best moments</div>
+        <div style="grid-column:1/-1;text-align:center;padding:48px 20px">
+          <div style="font-size:48px;margin-bottom:14px">&#9889;</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#c084fc,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">No clips yet today</div>
+          <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.6">Paste a YouTube link above and let AI find your most viral moments &#128293;</div>
         </div>
       </div>
     </div>
@@ -825,6 +825,7 @@ async function doLogin(){
     document.getElementById('pg-login').classList.remove('active');
     document.getElementById('pg-app').classList.add('active');
     showSub('dash',document.querySelectorAll('.ntab')[0]);
+    loadDashStats();
   }catch(e){document.getElementById('li-err').textContent='Login failed. Try again.'}
 }
 function doLogout(){document.getElementById('pg-app').classList.remove('active');document.getElementById('pg-login').classList.add('active');document.getElementById('dd').style.display='none';document.getElementById('li-err').textContent='';document.getElementById('em').value='';document.getElementById('pw').value='';currentUser=null;sb.auth.signOut()}
@@ -841,12 +842,16 @@ function renderClipsGrid(clips,count){
   var colors=['t1','t2','t3'];
   var showing=clips.slice(0,count);
   var html=showing.map(function(clip,i){
-    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
+    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="edOpenById('+clip.id+')" style="background:rgba(79,156,249,0.15);border-color:rgba(79,156,249,0.32);color:#7fbdff">&#9986; Edit</button><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
   }).join('');
   if(clips.length>count){
     var nextCount=count===6?20:clips.length;
-    var label=count===6?'Show More ('+Math.min(20,clips.length)+')':'Show All ('+clips.length+')';
-    html+='<div style="grid-column:1/-1;text-align:center;padding:16px"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
+    var label=count===6?'Show More':'Show All';
+    var btns='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center">';
+    btns+='<button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button>';
+    if(count>6)btns+='<button onclick="renderClipsGrid(allClipsCache,6)" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Show Less &#9650;</button>';
+    btns+='</div>';
+    html+=btns;
   }
   grid.innerHTML=html;
 }
@@ -1234,6 +1239,37 @@ function escH(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/
 function fmtAI(t){t=t.replace(/\*\*(.*?)\*\*/g,"<b style='color:#c4b5fd'>$1</b>");t=t.replace(/\n/g,'<br>');return t}
 async function sendMsg(){var inp=document.getElementById('ci'),text=inp.value.trim();if(!text)return;var msgs=document.getElementById('msgs');msgs.innerHTML+='<div class="mrow u"><div class="mav user">ME</div><div class="bubble user">'+escH(text)+'</div></div>';inp.value='';inp.disabled=true;document.querySelector('.sbtn').disabled=true;chatHistory.push({role:'user',content:text});var tid='t'+Date.now();msgs.innerHTML+='<div class="mrow" id="'+tid+'"><div class="mav ai">\u26A1</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div></div>';msgs.scrollTop=msgs.scrollHeight;try{var res=await fetch(BACKEND_URL+'/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});var data=await res.json();var reply=data&&data.reply?data.reply:'Sorry, try again!';chatHistory.push({role:'assistant',content:reply});var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai">'+fmtAI(reply)+'</div></div>'}catch(e){var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai" style="color:#f87171">Connection error. Try again!</div></div>'}inp.disabled=false;document.querySelector('.sbtn').disabled=false;inp.focus();msgs.scrollTop=msgs.scrollHeight}
 
+async function loadDashStats(){
+  try{
+    var uid=currentUser?currentUser.id:null;
+    if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
+    if(!uid)return;
+    var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:'ai'})});
+    var rd=await res.json();
+    if(!rd.success||!rd.clips)return;
+    var clips=rd.clips;
+    document.getElementById('scp').textContent=clips.length;
+    var now=Date.now(),weekAgo=now-7*24*60*60*1000;
+    var weekClips=clips.filter(function(c){return c.created_at&&new Date(c.created_at).getTime()>weekAgo;});
+    var weekEl=document.getElementById('scp-week');
+    if(weekEl)weekEl.textContent=weekClips.length>0?'\u2191 '+weekClips.length+' this week':'No new clips this week';
+    var bestEl=document.getElementById('dash-best-score');
+    var pctEl=document.getElementById('dash-best-percent');
+    if(bestEl){
+      var src=weekClips.length>0?weekClips:clips;
+      if(src.length>0){
+        var best=Math.max.apply(null,src.map(function(c){return c.viral_score||0;}));
+        bestEl.textContent=best;
+        var top=Math.max(1,Math.min(49,100-best));
+        if(pctEl)pctEl.textContent=weekClips.length>0?'Top '+top+'% this week':'All time best';
+      }else{bestEl.textContent='-';if(pctEl)pctEl.textContent='No clips yet';}
+    }
+  }catch(e){
+    var el=document.getElementById('scp');if(el)el.textContent='0';
+    var w=document.getElementById('scp-week');if(w)w.textContent='No clips yet';
+  }
+}
+
 async function generateClips(){
   var input=document.getElementById('yt-url');
   var url=input?input.value.trim():'';
@@ -1252,6 +1288,7 @@ async function generateClips(){
     }).join('');
     var badge=document.getElementById('dash-badge');if(badge){badge.style.display='';badge.textContent=data.clips.length+' Ready to Post';}
     btn.textContent='\u2705 Done!';
+    loadDashStats();
     try{
       var uid=currentUser?currentUser.id:null;
       if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
