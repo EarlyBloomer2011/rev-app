@@ -398,70 +398,114 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
   </div>
   <div id="sp-editor">
     <div class="etop">
-      <div><div class="etitle">&#9986; REV Editor <span class="ecn">- Insane 1v5 clutch</span></div></div>
+      <div>
+        <div class="etitle">&#9986; REV Editor <span class="ecn" id="ed-clip-name">- No clip loaded</span></div>
+      </div>
       <div class="eacts">
-        <button class="ebtn gh" onclick="edUndo()">&#8617; Undo AI</button>
-        <button class="ebtn pr">&#128065; Preview</button>
-        <button class="ebtn gr" onclick="edExport()">&#11015; Export MP4</button>
+        <button class="ebtn gh" onclick="edReset()">&#8617; Reset</button>
+        <button class="ebtn pr" onclick="edPreviewCaptions()">&#128065; Preview Captions</button>
+        <button class="ebtn gr" onclick="edExport()">&#11015; Export Info</button>
       </div>
     </div>
     <div class="emain">
       <div class="eprev">
-        <div class="parea">
-          <div class="pscreen">
-            <div class="pzb" id="pzb">&#128269; Zoom x1.3</div>
-            <div class="psb" id="psb">&#128266; Hype SFX</div>
-            <div class="ppbtn" onclick="togglePlay()"><span id="pi">&#9654;</span></div>
-            <div class="pcap" id="pcap"><span id="capd" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:white;text-shadow:0 0 20px rgba(124,92,252,0.8),2px 2px 0 #000">INSANE CLUTCH &#128293;</span></div>
+        <div class="parea" style="background:#000;position:relative">
+          <div id="ed-no-clip" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5">
+            <div style="font-size:48px;margin-bottom:16px">&#9986;</div>
+            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#c4b5fd;margin-bottom:8px">No clip loaded</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;max-width:260px">Go to My Clips and click Edit on a clip to open it here</div>
+          </div>
+          <div id="ed-yt-wrap" style="width:100%;height:100%;display:none;position:relative">
+            <iframe id="ed-yt" style="width:100%;height:100%;border:none" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            <div id="ed-cap-overlay" style="position:absolute;bottom:60px;left:0;right:0;text-align:center;pointer-events:none;display:none">
+              <span id="ed-cap-text" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:white;text-shadow:2px 2px 0 #000,0 0 20px rgba(124,92,252,0.8);padding:4px 12px;border-radius:8px;background:rgba(0,0,0,0.35)"></span>
+            </div>
           </div>
         </div>
         <div class="pbar">
-          <div class="ptr" onclick="scrub(event)"><div class="pfi" id="pfi"></div></div>
-          <div class="pctl">
-            <div class="pbl"><button class="pbb">&#9198;</button><button class="pbb" onclick="togglePlay()">&#9199;</button><button class="pbb">&#9197;</button><span class="ptm" id="ptm">0:12 / 0:33</span></div>
-            <div class="pbr"><span>&#128266;</span><span>9:16</span><span style="color:var(--p2)">HD</span></div>
+          <div style="padding:8px 0 4px">
+            <div style="font-size:10px;color:var(--hint);margin-bottom:5px;display:flex;justify-content:space-between"><span>Trim Start</span><span>Trim End</span></div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:12px;color:var(--p2);font-family:monospace;min-width:36px" id="ed-trim-start-lbl">0:00</span>
+              <div style="flex:1;position:relative;height:28px;display:flex;align-items:center">
+                <div style="position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,0.08);border-radius:2px"></div>
+                <div id="ed-trim-range" style="position:absolute;height:4px;background:linear-gradient(90deg,#7c5cfc,#4f9cf9);border-radius:2px;left:0%;right:0%"></div>
+                <input type="range" id="ed-trim-start" min="0" max="100" value="0" style="position:absolute;left:0;right:0;width:100%;opacity:0;cursor:pointer;height:28px;z-index:2" oninput="edUpdateTrim()"/>
+                <input type="range" id="ed-trim-end" min="0" max="100" value="100" style="position:absolute;left:0;right:0;width:100%;opacity:0;cursor:pointer;height:28px;z-index:3" oninput="edUpdateTrim()"/>
+                <div id="ed-trim-start-handle" style="position:absolute;width:14px;height:14px;background:#7c5cfc;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(124,92,252,0.6);left:0%;transform:translateX(-50%);pointer-events:none;z-index:4"></div>
+                <div id="ed-trim-end-handle" style="position:absolute;width:14px;height:14px;background:#4f9cf9;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(79,156,249,0.6);left:100%;transform:translateX(-50%);pointer-events:none;z-index:4"></div>
+              </div>
+              <span style="font-size:12px;color:var(--b);font-family:monospace;min-width:36px;text-align:right" id="ed-trim-end-lbl">0:45</span>
+            </div>
+            <div style="display:flex;justify-content:center;margin-top:6px">
+              <span style="font-size:11px;color:var(--muted)" id="ed-duration-lbl">Duration: 0:45</span>
+            </div>
           </div>
-        </div>
-        <div class="tla">
-          <div class="tllbl"><span>Timeline</span><span>0:33</span></div>
-          <div class="tltr"><div class="tlseg" style="left:0;width:100%;background:rgba(124,92,252,0.25);border:1px solid rgba(124,92,252,0.4)">&#128249; Video clip</div><div class="tlph" id="tlh" style="left:35%"></div></div>
-          <div class="tltr"><div class="tlseg" style="left:0;width:20%;background:rgba(79,156,249,0.2);border:1px solid rgba(79,156,249,0.35)" onclick="switchPanel('captions')">&#128172; Insane</div><div class="tlseg" style="left:22%;width:25%;background:rgba(79,156,249,0.2);border:1px solid rgba(79,156,249,0.35)" onclick="switchPanel('captions')">&#128172; Clutch!</div><div class="tlseg" style="left:50%;width:30%;background:rgba(79,156,249,0.2);border:1px solid rgba(79,156,249,0.35)" onclick="switchPanel('captions')">&#128172; NO WAY</div></div>
-          <div class="tltr"><div class="tlseg" style="left:5%;width:18%;background:rgba(34,212,126,0.15);border:1px solid rgba(34,212,126,0.3)" onclick="switchPanel('sounds')">&#128266; Hype</div><div class="tlseg" style="left:48%;width:15%;background:rgba(34,212,126,0.15);border:1px solid rgba(34,212,126,0.3)" onclick="switchPanel('sounds')">&#128266; Boom</div></div>
+          <div style="height:40px;background:rgba(255,255,255,0.03);border-radius:6px;margin-top:4px;position:relative;overflow:hidden" id="ed-waveform">
+            <div id="ed-waveform-bars" style="display:flex;align-items:center;height:100%;gap:1px;padding:2px 4px"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--hint)" id="ed-waveform-msg">Load a clip to see audio waveform</div>
+          </div>
         </div>
       </div>
       <div class="epanel">
         <div class="ptabs">
-          <div class="ptab on" onclick="switchPanel('ai')">&#129302; AI</div>
-          <div class="ptab" onclick="switchPanel('captions')">&#128172; Captions</div>
-          <div class="ptab" onclick="switchPanel('sounds')">&#128266; Sounds</div>
+          <div class="ptab on" onclick="switchPanel('captions')">&#128172; Captions</div>
           <div class="ptab" onclick="switchPanel('style')">&#127912; Style</div>
+          <div class="ptab" onclick="switchPanel('info')">&#8505; Info</div>
         </div>
-        <div class="pbody" id="panel-ai">
-          <div class="ailbl">AI made these edits automatically</div>
-          <div class="aisg"><div class="sgi">&#128269;</div><div class="sginfo"><div class="sgt">Zoom punch at 0:08</div><div class="sgd">1.3x zoom on hype moment</div></div><div class="sgtog"><button class="tog on" onclick="toggleSug(this,'pzb')"></button></div></div>
-          <div class="aisg"><div class="sgi">&#128266;</div><div class="sginfo"><div class="sgt">Hype SFX at 0:08</div><div class="sgd">Bass drop on clutch moment</div></div><div class="sgtog"><button class="tog on" onclick="toggleSug(this,'psb')"></button></div></div>
-          <div class="aisg"><div class="sgi">&#128172;</div><div class="sginfo"><div class="sgt">Auto-captions (3 segments)</div><div class="sgd">Word-by-word from speech</div></div><div class="sgtog"><button class="tog on" onclick="toggleCaptions(this)"></button></div></div>
-          <div class="aisg"><div class="sgi">&#9986;</div><div class="sginfo"><div class="sgt">Trimmed to 0:33</div><div class="sgd">Best 33 seconds selected</div></div><div class="sgtog"><button class="tog on"></button></div></div>
-          <div class="aisg"><div class="sgi">&#128247;</div><div class="sginfo"><div class="sgt">9:16 vertical format</div><div class="sgd">Auto-cropped for TikTok</div></div><div class="sgtog"><button class="tog on"></button></div></div>
-          <div style="margin-top:12px;padding:10px 12px;background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.2);border-radius:10px;font-size:12px;color:rgba(240,238,255,0.6);line-height:1.5">&#9889; <span style="color:#c4b5fd;font-weight:500">Viral Score: 98/100</span> - Post tonight 6-9PM for best reach.</div>
-        </div>
-        <div class="pbody" id="panel-captions" style="display:none">
-          <div class="ailbl">Edit captions</div>
-          <div class="capi"><div class="capt">0:00 to 0:06</div><textarea class="captxt" rows="2">INSANE CLUTCH &#128293;</textarea><div class="capsr"><button class="fb on" onclick="setFont(this,'Syne')">Syne</button><button class="fb" onclick="setFont(this,'Impact')">Impact</button><button class="fb" onclick="setFont(this,&quot;DM Sans&quot;)">Clean</button></div><div class="cdots"><span style="font-size:11px;color:var(--hint);margin-right:2px">Color:</span><div class="cdot on" style="background:#fff" onclick="setCapColor(this,'#fff')"></div><div class="cdot" style="background:#c4b5fd" onclick="setCapColor(this,'#c4b5fd')"></div><div class="cdot" style="background:#4de89a" onclick="setCapColor(this,'#4de89a')"></div><div class="cdot" style="background:#fcd34d" onclick="setCapColor(this,'#fcd34d')"></div><div class="cdot" style="background:#f87171" onclick="setCapColor(this,'#f87171')"></div></div></div>
-          <div class="capi"><div class="capt">0:10 to 0:18</div><textarea class="captxt" rows="2">They thought I was dead...</textarea><div class="capsr"><button class="fb on">Syne</button><button class="fb">Impact</button><button class="fb">Clean</button></div></div>
-          <div class="capi"><div class="capt">0:22 to 0:33</div><textarea class="captxt" rows="2">NO WAY THAT JUST HAPPENED</textarea><div class="capsr"><button class="fb on">Syne</button><button class="fb">Impact</button><button class="fb">Clean</button></div></div>
-        </div>
-        <div class="pbody" id="panel-sounds" style="display:none">
-          <div class="ailbl">Sound effects library</div>
-          <div class="sfxcat"><div class="sfxlbl">&#128293; Hype</div><div class="sfxg"><button class="sfxb active" onclick="pickSfx(this,'Hype SFX')">&#128266; Bass Drop</button><button class="sfxb" onclick="pickSfx(this,'Air Horn')">&#128239; Air Horn</button><button class="sfxb" onclick="pickSfx(this,'Crowd Cheer')">&#127881; Crowd</button><button class="sfxb" onclick="pickSfx(this,'Boom')">&#128165; Boom</button></div></div>
-          <div class="sfxcat"><div class="sfxlbl">&#128514; Funny</div><div class="sfxg"><button class="sfxb" onclick="pickSfx(this,'Vine Boom')">&#127925; Vine Boom</button><button class="sfxb" onclick="pickSfx(this,'Bruh')">&#128528; Bruh</button><button class="sfxb" onclick="pickSfx(this,'Clown')">&#129313; Clown</button><button class="sfxb" onclick="pickSfx(this,'Sad')">&#128546; Sad</button></div></div>
-          <div class="sfxcat"><div class="sfxlbl">&#9889; Gaming</div><div class="sfxg"><button class="sfxb" onclick="pickSfx(this,'Level Up')">&#127918; Level Up</button><button class="sfxb" onclick="pickSfx(this,'Headshot')">&#127919; Headshot</button><button class="sfxb" onclick="pickSfx(this,'Victory')">&#127942; Victory</button><button class="sfxb" onclick="pickSfx(this,'Streak')">&#128293; Streak</button></div></div>
+        <div class="pbody" id="panel-captions">
+          <div class="ailbl">Add captions</div>
+          <div id="ed-captions-list"></div>
+          <button onclick="edAddCaption()" style="width:100%;padding:10px;background:rgba(124,92,252,0.12);border:1px dashed rgba(124,92,252,0.4);color:#c4b5fd;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px">+ Add Caption</button>
         </div>
         <div class="pbody" id="panel-style" style="display:none">
-          <div class="ailbl">Visual style</div>
-          <div style="margin-bottom:14px"><div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Caption preset</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div onclick="setStylePreset(this,'viral')" style="background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.4);border-radius:8px;padding:10px;cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:#c4b5fd">&#128293; Viral</div><div onclick="setStylePreset(this,'clean')" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;font-size:12px;color:var(--muted)">&#10024; Clean</div><div onclick="setStylePreset(this,'bold')" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;font-size:12px;color:var(--muted)">&#128170; Bold</div><div onclick="setStylePreset(this,'minimal')" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;font-size:12px;color:var(--muted)">&#9633; Minimal</div></div></div>
-          <div style="margin-bottom:14px"><div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Caption size</div><input type="range" min="14" max="36" value="22" style="width:100%" oninput="setCapSize(this.value)"/><div style="font-size:11px;color:var(--hint);text-align:right;margin-top:3px" id="csl">22px</div></div>
-          <div><div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Caption position</div><div style="display:flex;gap:6px"><button class="fb" onclick="setCapPos(this,'top')">Top</button><button class="fb on" onclick="setCapPos(this,'bottom')">Bottom</button><button class="fb" onclick="setCapPos(this,'center')">Center</button></div></div>
+          <div class="ailbl">Caption style</div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Font</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="fb on" onclick="edSetFont(this,'Syne')">Syne</button>
+              <button class="fb" onclick="edSetFont(this,'Impact')">Impact</button>
+              <button class="fb" onclick="edSetFont(this,\'DM Sans\')">Clean</button>
+              <button class="fb" onclick="edSetFont(this,'Arial Black')">Bold</button>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Text Color</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div style="width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;border:2px solid white" onclick="edSetColor('#fff')"></div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#c4b5fd;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#c4b5fd')"></div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#4de89a;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#4de89a')"></div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#fcd34d;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#fcd34d')"></div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#f87171;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#f87171')"></div>
+              <div style="width:24px;height:24px;border-radius:50%;background:#60a5fa;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#60a5fa')"></div>
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Font Size: <span id="ed-size-lbl">24px</span></div>
+            <input type="range" min="14" max="48" value="24" style="width:100%;accent-color:#7c5cfc" oninput="edSetSize(this.value)"/>
+          </div>
+          <div>
+            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Position</div>
+            <div style="display:flex;gap:6px">
+              <button class="fb" onclick="edSetPos(this,'top')">Top</button>
+              <button class="fb" onclick="edSetPos(this,'center')">Center</button>
+              <button class="fb on" onclick="edSetPos(this,'bottom')">Bottom</button>
+            </div>
+          </div>
+        </div>
+        <div class="pbody" id="panel-info" style="display:none">
+          <div class="ailbl">Clip info</div>
+          <div id="ed-clip-info" style="font-size:13px;color:var(--muted);line-height:1.8">
+            <div>No clip loaded</div>
+          </div>
+          <div style="margin-top:16px">
+            <div style="font-size:11px;color:var(--hint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">Watch on YouTube</div>
+            <a id="ed-yt-link" href="#" target="_blank" style="display:block;background:rgba(255,0,0,0.12);border:1px solid rgba(255,0,0,0.3);color:#f87171;padding:10px 14px;border-radius:10px;font-size:13px;text-decoration:none;text-align:center">&#9654; Open in YouTube</a>
+          </div>
+          <div style="margin-top:12px">
+            <div style="font-size:11px;color:var(--hint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">Edit in YouTube Studio</div>
+            <a id="ed-studio-link" href="#" target="_blank" style="display:block;background:rgba(124,92,252,0.12);border:1px solid rgba(124,92,252,0.3);color:#c4b5fd;padding:10px 14px;border-radius:10px;font-size:13px;text-decoration:none;text-align:center">&#9986; Open in Studio</a>
+          </div>
         </div>
       </div>
     </div>
@@ -739,7 +783,7 @@ function renderClipsGrid(clips,count){
   var colors=['t1','t2','t3'];
   var showing=clips.slice(0,count);
   var html=showing.map(function(clip,i){
-    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
+    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn post" onclick="openEditor(allClipsCache[i])" style="background:rgba(79,156,249,0.15);border-color:rgba(79,156,249,0.32);color:#7fbdff">&#9986; Edit</button><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
   }).join('');
   var btns='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center">';
   if(clips.length>count){
@@ -784,22 +828,113 @@ function setClipsFilter(type){document.getElementById('clips-filter-dd').style.d
 document.addEventListener('click',function(e){var dd=document.getElementById('clips-filter-dd');if(dd&&!e.target.closest('#clips-filter-dd')&&!e.target.closest('[onclick="toggleClipsFilter()"]'))dd.style.display='none';});
 async function deleteClip(id,btn){if(!confirm('Delete this clip?'))return;await fetch(BACKEND_URL+'/api/delete-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});loadSavedClips();}
 
-function openEditor(){showSub('editor',document.querySelectorAll('.ntab')[2])}
-function switchPanel(n){['ai','captions','sounds','style'].forEach(function(p){var el=document.getElementById('panel-'+p);if(el)el.style.display=p===n?'block':'none'});document.querySelectorAll('.ptab').forEach(function(t,i){t.classList.toggle('on',['ai','captions','sounds','style'][i]===n)})}
-function toggleSug(btn,id){btn.classList.toggle('on');btn.classList.toggle('off');var b=document.getElementById(id);if(b)b.style.display=btn.classList.contains('on')?'':'none'}
-function toggleCaptions(btn){btn.classList.toggle('on');btn.classList.toggle('off');var c=document.getElementById('capd');if(c)c.style.display=btn.classList.contains('on')?'':'none'}
-function pickSfx(btn,name){document.querySelectorAll('.sfxb').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');var b=document.getElementById('psb');if(b)b.textContent='\uD83D\uDD0A '+name}
-function setFont(btn,font){btn.closest('.capsr').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');var c=document.getElementById('capd');if(c)c.style.fontFamily=font}
-function setCapColor(dot,color){dot.closest('.cdots').querySelectorAll('.cdot').forEach(function(d){d.classList.remove('on')});dot.classList.add('on');var c=document.getElementById('capd');if(c)c.style.color=color}
-function setCapSize(v){document.getElementById('csl').textContent=v+'px';var c=document.getElementById('capd');if(c)c.style.fontSize=v+'px'}
-function setCapPos(btn,pos){btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');var c=document.getElementById('pcap');if(!c)return;if(pos==='top'){c.style.bottom='auto';c.style.top='60px'}else if(pos==='center'){c.style.bottom='auto';c.style.top='50%'}else{c.style.top='auto';c.style.bottom='60px'}}
-function setStylePreset(el,preset){el.parentElement.querySelectorAll('div[onclick]').forEach(function(d){d.style.background='var(--card)';d.style.borderColor='var(--border)';d.style.color='var(--muted)'});el.style.background='rgba(124,92,252,0.15)';el.style.borderColor='rgba(124,92,252,0.4)';el.style.color='#c4b5fd';var c=document.getElementById('capd');if(!c)return;var pr={viral:{font:'Syne',size:'24px',color:'#fff',shadow:'0 0 20px rgba(124,92,252,0.8),2px 2px 0 #000'},bold:{font:'Impact',size:'28px',color:'#fcd34d',shadow:'2px 2px 0 #000'},clean:{font:'DM Sans',size:'18px',color:'#fff',shadow:'1px 1px 4px rgba(0,0,0,0.8)'},minimal:{font:'DM Sans',size:'16px',color:'rgba(255,255,255,0.9)',shadow:'none'}};var p=pr[preset]||pr.viral;c.style.fontFamily=p.font;c.style.fontSize=p.size;c.style.color=p.color;c.style.textShadow=p.shadow}
-var playing=false,progress=35;
-function togglePlay(){playing=!playing;document.getElementById('pi').textContent=playing?'\u23F8':'\u25B6';if(playing)animatePlayback()}
-function animatePlayback(){if(!playing)return;progress=Math.min(progress+0.3,100);document.getElementById('pfi').style.width=progress+'%';document.getElementById('tlh').style.left=progress+'%';var s=Math.round(progress*33/100)%60;document.getElementById('ptm').textContent='0:'+String(s).padStart(2,'0')+' / 0:33';var caps=['INSANE CLUTCH \uD83D\uDD25','They thought I was dead...','NO WAY! \uD83D\uDE31'];var ci=progress<35?0:progress<65?1:2;var ce=document.getElementById('capd');if(ce&&ce.style.display!=='none')ce.textContent=caps[ci];if(progress>=100){playing=false;document.getElementById('pi').textContent='\u25B6';progress=0;return}requestAnimationFrame(function(){setTimeout(animatePlayback,50)})}
-function scrub(e){progress=Math.max(0,Math.min(100,(e.offsetX/e.currentTarget.offsetWidth)*100));document.getElementById('pfi').style.width=progress+'%';document.getElementById('tlh').style.left=progress+'%'}
-function edUndo(){document.querySelectorAll('.tog').forEach(function(t){t.classList.remove('on');t.classList.add('off')});document.getElementById('pzb').style.display='none';document.getElementById('psb').style.display='none';document.getElementById('capd').style.display='none'}
-function edExport(){var btn=document.querySelector('.ebtn.gr'),orig=btn.textContent;btn.textContent='\u23F3 Exporting...';btn.style.opacity='0.7';setTimeout(function(){btn.textContent='\u2705 Exported!';setTimeout(function(){btn.textContent=orig;btn.style.opacity='1'},2000)},2000)}
+// EDITOR
+var edClip=null;
+var edCaptions=[];
+var edFont='Syne';
+var edColor='#fff';
+var edSize=24;
+var edPos='bottom';
+var edCapPreview=false;
+
+function openEditor(clip){
+  edClip=clip||null;
+  showSub('editor',document.querySelectorAll('.ntab')[2]);
+  if(edClip)edLoadClip();
+}
+
+function edLoadClip(){
+  if(!edClip)return;
+  document.getElementById('ed-no-clip').style.display='none';
+  document.getElementById('ed-yt-wrap').style.display='block';
+  document.getElementById('ed-clip-name').textContent='- '+edClip.clip_title;
+  var videoId=edGetVideoId(edClip.youtube_url||'');
+  var startSec=edTsToSec(edClip.timestamp_start||'0:00');
+  var endSec=edTsToSec(edClip.timestamp_end||'0:45');
+  var duration=endSec-startSec;
+  if(videoId){
+    document.getElementById('ed-yt').src='https://www.youtube.com/embed/'+videoId+'?start='+startSec+'&autoplay=0&controls=1&modestbranding=1&rel=0';
+  }
+  document.getElementById('ed-trim-start').min=0;
+  document.getElementById('ed-trim-start').max=duration;
+  document.getElementById('ed-trim-start').value=0;
+  document.getElementById('ed-trim-end').min=0;
+  document.getElementById('ed-trim-end').max=duration;
+  document.getElementById('ed-trim-end').value=duration;
+  document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec);
+  document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(endSec);
+  document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(duration);
+  document.getElementById('ed-yt-link').href=edClip.youtube_url||'#';
+  document.getElementById('ed-studio-link').href=edClip.studio_url||'#';
+  document.getElementById('ed-clip-info').innerHTML='<div><b style="color:var(--text)">Title:</b> '+edClip.clip_title+'</div><div><b style="color:var(--text)">Video:</b> '+(edClip.video_title||'Unknown')+'</div><div><b style="color:var(--text)">Timestamps:</b> '+edClip.timestamp_start+' - '+edClip.timestamp_end+'</div><div><b style="color:var(--text)">Viral Score:</b> <span style="color:#4de89a">'+edClip.viral_score+'/100</span></div>';
+  edGenerateWaveform(duration);
+  edCaptions=[];
+  edRenderCaptions();
+  edUpdateTrim();
+}
+
+function edGetVideoId(url){var m=url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);return m?m[1]:'';}
+function edTsToSec(ts){var p=ts.split(':');if(p.length===2)return parseInt(p[0])*60+parseInt(p[1]);if(p.length===3)return parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);return 0;}
+function edSecToTs(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
+
+function edUpdateTrim(){
+  if(!edClip)return;
+  var startSec=edTsToSec(edClip.timestamp_start||'0:00');
+  var endSec=edTsToSec(edClip.timestamp_end||'0:45');
+  var duration=endSec-startSec;
+  var s=parseFloat(document.getElementById('ed-trim-start').value);
+  var e=parseFloat(document.getElementById('ed-trim-end').value);
+  if(s>=e-2)s=e-2;
+  document.getElementById('ed-trim-start').value=s;
+  document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec+s);
+  document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(startSec+e);
+  document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(e-s);
+  var sp=duration>0?s/duration*100:0;
+  var ep=duration>0?e/duration*100:100;
+  document.getElementById('ed-trim-range').style.left=sp+'%';
+  document.getElementById('ed-trim-range').style.right=(100-ep)+'%';
+  document.getElementById('ed-trim-start-handle').style.left=sp+'%';
+  document.getElementById('ed-trim-end-handle').style.left=ep+'%';
+}
+
+function edGenerateWaveform(duration){
+  var bars=document.getElementById('ed-waveform-bars');
+  var msg=document.getElementById('ed-waveform-msg');
+  msg.style.display='none';
+  var count=Math.min(80,Math.max(20,Math.round(duration*1.5)));
+  var html='';
+  for(var i=0;i<count;i++){var h=20+Math.random()*60;var alpha=0.4+Math.random()*0.6;var color=Math.random()>0.7?'79,156,249':'124,92,252';html+='<div style="flex:1;height:'+h+'%;background:rgba('+color+','+alpha+');border-radius:1px;min-width:2px"></div>';}
+  bars.innerHTML=html;
+}
+
+function edAddCaption(){var id=Date.now();edCaptions.push({id:id,text:'Caption text',start:'0:00',end:'0:05'});edRenderCaptions();}
+
+function edRenderCaptions(){
+  var list=document.getElementById('ed-captions-list');
+  if(edCaptions.length===0){list.innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:16px">No captions yet. Click Add Caption below.</div>';return;}
+  list.innerHTML=edCaptions.map(function(cap){
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:8px">'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px">'
+      +'<input value="'+cap.start+'" onchange="edUpdateCap('+cap.id+',\'start\',this.value)" style="width:52px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;font-size:11px;color:var(--text);font-family:monospace;text-align:center"/>'
+      +'<span style="color:var(--hint);font-size:11px;line-height:26px">to</span>'
+      +'<input value="'+cap.end+'" onchange="edUpdateCap('+cap.id+',\'end\',this.value)" style="width:52px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;font-size:11px;color:var(--text);font-family:monospace;text-align:center"/>'
+      +'<button onclick="edDeleteCap('+cap.id+')" style="margin-left:auto;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:#f87171;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer">\u{1F5D1}</button>'
+      +'</div>'
+      +'<textarea onchange="edUpdateCap('+cap.id+',\'text\',this.value)" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--text);font-family:\'DM Sans\',sans-serif;outline:none;resize:none" rows="2">'+cap.text+'</textarea>'
+      +'</div>';
+  }).join('');
+}
+
+function edUpdateCap(id,field,val){edCaptions=edCaptions.map(function(c){if(c.id===id)c[field]=val;return c});}
+function edDeleteCap(id){edCaptions=edCaptions.filter(function(c){return c.id!==id});edRenderCaptions();}
+function edSetFont(btn,font){edFont=font;btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');document.getElementById('ed-cap-text').style.fontFamily=font;}
+function edSetColor(color){edColor=color;document.getElementById('ed-cap-text').style.color=color;}
+function edSetSize(v){edSize=parseInt(v);document.getElementById('ed-size-lbl').textContent=v+'px';document.getElementById('ed-cap-text').style.fontSize=v+'px';}
+function edSetPos(btn,pos){edPos=pos;btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');var ov=document.getElementById('ed-cap-overlay');if(pos==='top'){ov.style.bottom='auto';ov.style.top='60px';}else if(pos==='center'){ov.style.bottom='auto';ov.style.top='50%';}else{ov.style.top='auto';ov.style.bottom='60px';}}
+function edPreviewCaptions(){edCapPreview=!edCapPreview;var ov=document.getElementById('ed-cap-overlay');var ct=document.getElementById('ed-cap-text');if(edCapPreview&&edCaptions.length>0){ov.style.display='block';ct.textContent=edCaptions[0].text;ct.style.fontFamily=edFont;ct.style.color=edColor;ct.style.fontSize=edSize+'px';}else{ov.style.display='none';edCapPreview=false;}}
+function edReset(){edClip=null;edCaptions=[];document.getElementById('ed-no-clip').style.display='flex';document.getElementById('ed-yt-wrap').style.display='none';document.getElementById('ed-yt').src='';document.getElementById('ed-clip-name').textContent='- No clip loaded';document.getElementById('ed-waveform-bars').innerHTML='';document.getElementById('ed-waveform-msg').style.display='flex';edRenderCaptions();}
+function edExport(){if(!edClip){alert('No clip loaded!');return;}var startSec=edTsToSec(edClip.timestamp_start||'0:00');var s=parseFloat(document.getElementById('ed-trim-start').value)||0;var e=parseFloat(document.getElementById('ed-trim-end').value)||45;var trimStart=edSecToTs(startSec+s);var trimEnd=edSecToTs(startSec+e);var info='Clip: '+edClip.clip_title+'\nTrim: '+trimStart+' to '+trimEnd+'\nDuration: '+edSecToTs(e-s)+'\nYouTube: '+edClip.youtube_url+'\nStudio: '+edClip.studio_url+'\n\nCaptions:\n'+edCaptions.map(function(c){return c.start+'-'+c.end+': '+c.text}).join('\n');alert(info);}
+function switchPanel(n){['captions','style','info'].forEach(function(p){var el=document.getElementById('panel-'+p);if(el)el.style.display=p===n?'block':'none'});document.querySelectorAll('.ptab').forEach(function(t,i){t.classList.toggle('on',['captions','style','info'][i]===n)})}
 
 var chatHistory=[];
 function escH(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
