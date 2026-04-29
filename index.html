@@ -349,19 +349,19 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         </div>
       </div>
       <div class="sg">
-        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">-</div><div class="scd" id="scp-week">Loading...</div></div>
+        <div class="sc p"><div class="scl">Total Clips</div><div class="scv p" id="scp">24</div><div class="scd">&#8593; 8 this week</div></div>
         <div class="sc b"><div class="scl">Total Views</div><div class="scv b">14.2K</div><div class="scd">&#8593; 2.1K this week</div></div>
         <div class="sc g"><div class="scl">Followers Gained</div><div class="scv g">+312</div><div class="scd">&#8593; 48 this week</div></div>
-        <div class="sc am"><div class="scl">Best Score This Week</div><div class="scv am" id="dash-best-score">-</div><div class="scd" id="dash-best-percent">Loading...</div></div>
+        <div class="sc am"><div class="scl">Best Score</div><div class="scv am">98</div><div class="scd">Top 2% of clips</div></div>
       </div>
       <div class="shdr">
         <div class="stitle">&#9889; Generated Clips <span class="sbadge" id="dash-badge" style="display:none">Ready to Post</span></div>
       </div>
       <div class="cgrid" id="dc">
-        <div style="grid-column:1/-1;text-align:center;padding:48px 20px">
-          <div style="font-size:48px;margin-bottom:14px">&#9889;</div>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#c084fc,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px">No clips yet today</div>
-          <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.6">Paste a YouTube link above and let AI find your most viral moments &#128293;</div>
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+          <div style="font-size:32px;margin-bottom:12px">&#127916;</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--muted);margin-bottom:6px">No clips generated today</div>
+          <div style="font-size:13px">Paste a YouTube link above to find your best moments</div>
         </div>
       </div>
     </div>
@@ -397,121 +397,178 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
     </div>
   </div>
   <div id="sp-editor">
-    <div class="etop">
-      <div>
-        <div class="etitle">&#9986; REV Editor <span class="ecn" id="ed-clip-name">- No clip loaded</span></div>
+    <div style="height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(7,7,26,0.98);border-bottom:1px solid var(--border);flex-shrink:0;z-index:20">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button onclick="edReset()" style="background:transparent;border:1px solid var(--border2);color:var(--muted);padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">&#8592; Back</button>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text)" id="ed-clip-name">No clip loaded</div>
       </div>
-      <div class="eacts">
-        <button class="ebtn gh" onclick="edReset()">&#8617; Reset</button>
-        <button class="ebtn pr" onclick="edPreviewCaptions()">&#128065; Preview Captions</button>
-        <button class="ebtn gr" onclick="edExport()">&#11015; Export Info</button>
+      <div style="display:flex;gap:8px">
+        <button onclick="edTogglePreview()" id="ed-preview-btn" style="background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.35);color:#c4b5fd;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">&#128065; Preview</button>
+        <button onclick="edExport()" style="background:linear-gradient(135deg,#22d47e,#16a34a);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">&#11015; Export</button>
       </div>
     </div>
-    <div class="emain">
-      <div class="eprev">
-        <div class="parea" style="background:#000;position:relative">
+    <div style="flex:1;display:flex;overflow:hidden">
+      <div style="width:64px;background:rgba(7,7,26,0.95);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0">
+        <div id="edtool-text" onclick="edTool('text')" style="width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;background:rgba(124,92,252,0.18);border:1px solid rgba(124,92,252,0.35)">
+          <div style="font-size:18px">&#128172;</div><div style="font-size:9px;color:#c4b5fd;font-weight:500">Text</div>
+        </div>
+        <div id="edtool-style" onclick="edTool('style')" style="width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;border:1px solid transparent">
+          <div style="font-size:18px">&#127912;</div><div style="font-size:9px;color:var(--muted);font-weight:500">Style</div>
+        </div>
+        <div id="edtool-sticker" onclick="edTool('sticker')" style="width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;border:1px solid transparent">
+          <div style="font-size:18px">&#10024;</div><div style="font-size:9px;color:var(--muted);font-weight:500">Stickers</div>
+        </div>
+        <div id="edtool-filter" onclick="edTool('filter')" style="width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;border:1px solid transparent">
+          <div style="font-size:18px">&#127771;</div><div style="font-size:9px;color:var(--muted);font-weight:500">Filter</div>
+        </div>
+        <div id="edtool-info" onclick="edTool('info')" style="width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;border:1px solid transparent">
+          <div style="font-size:18px">&#8505;</div><div style="font-size:9px;color:var(--muted);font-weight:500">Info</div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <div style="flex:1;background:#000;position:relative;overflow:hidden">
           <div id="ed-no-clip" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5">
-            <div style="font-size:48px;margin-bottom:16px">&#9986;</div>
+            <div style="font-size:52px;margin-bottom:16px">&#9986;</div>
             <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#c4b5fd;margin-bottom:8px">No clip loaded</div>
-            <div style="font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;max-width:260px">Go to My Clips and click Edit on a clip to open it here</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;max-width:260px;line-height:1.6">Go to My Clips and click Edit on a clip to open it here</div>
+            <label style="background:linear-gradient(135deg,#7c5cfc,#4f9cf9);color:white;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">
+              &#128249; Import Video File
+              <input type="file" accept="video/*" style="display:none" onchange="edImportFile(this)"/>
+            </label>
           </div>
           <div id="ed-yt-wrap" style="width:100%;height:100%;display:none;position:relative">
             <iframe id="ed-yt" style="width:100%;height:100%;border:none" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            <div id="ed-cap-overlay" style="position:absolute;bottom:60px;left:0;right:0;text-align:center;pointer-events:none;display:none">
-              <span id="ed-cap-text" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:white;text-shadow:2px 2px 0 #000,0 0 20px rgba(124,92,252,0.8);padding:4px 12px;border-radius:8px;background:rgba(0,0,0,0.35)"></span>
+            <div id="ed-cap-overlay" style="position:absolute;left:0;right:0;bottom:60px;text-align:center;pointer-events:none;display:none;padding:0 20px">
+              <span id="ed-cap-text" style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:white;text-shadow:2px 2px 0 #000;padding:6px 16px;border-radius:10px;display:inline-block"></span>
+            </div>
+          </div>
+          <div id="ed-file-wrap" style="width:100%;height:100%;display:none;position:relative">
+            <video id="ed-video" style="width:100%;height:100%;object-fit:contain" controls></video>
+            <div id="ed-file-cap-overlay" style="position:absolute;left:0;right:0;bottom:60px;text-align:center;pointer-events:none;padding:0 20px">
+              <span id="ed-file-cap-text" style="display:none;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:white;text-shadow:2px 2px 0 #000;padding:6px 16px;border-radius:10px"></span>
             </div>
           </div>
         </div>
-        <div class="pbar" style="padding:0;background:rgba(7,7,26,0.95);border-top:1px solid var(--border)">
-          <div style="padding:10px 16px 6px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:11px;color:var(--hint)">Timeline</span>
-            <span style="font-size:11px;color:var(--muted)" id="ed-duration-lbl">Duration: 0:45</span>
-            <div style="display:flex;gap:12px;align-items:center">
-              <span style="font-size:11px;font-family:monospace;color:var(--p2)" id="ed-trim-start-lbl">0:00</span>
-              <span style="font-size:11px;color:var(--hint)">→</span>
-              <span style="font-size:11px;font-family:monospace;color:var(--b)" id="ed-trim-end-lbl">0:45</span>
+        <div style="background:rgba(7,7,26,0.98);border-top:1px solid var(--border);flex-shrink:0;padding:8px 16px 10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="display:flex;gap:12px">
+              <span style="font-size:10px;color:var(--hint)">TIMELINE</span>
+              <span style="font-size:11px;font-family:monospace;color:var(--p2)" id="ed-start-lbl">0:00</span>
+              <span style="font-size:11px;color:var(--hint)">&#8594;</span>
+              <span style="font-size:11px;font-family:monospace;color:var(--b)" id="ed-end-lbl">0:45</span>
+            </div>
+            <span style="font-size:11px;color:var(--muted)" id="ed-dur-lbl">Duration: 0:45</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:10px;color:var(--hint);width:40px;flex-shrink:0">Video</span>
+            <div id="ed-timeline" style="flex:1;height:52px;background:rgba(124,92,252,0.06);border-radius:8px;position:relative;overflow:hidden;cursor:col-resize">
+              <div id="ed-tl-bars" style="position:absolute;inset:0;display:flex;align-items:center;gap:1px;padding:4px"></div>
+              <div id="ed-tl-ldark" style="position:absolute;top:0;bottom:0;left:0;width:0;background:rgba(0,0,0,0.75);pointer-events:none;z-index:2"></div>
+              <div id="ed-tl-rdark" style="position:absolute;top:0;bottom:0;right:0;width:0;background:rgba(0,0,0,0.75);pointer-events:none;z-index:2"></div>
+              <div id="ed-tl-border" style="position:absolute;top:0;bottom:0;left:0;right:0;border:2px solid #7c5cfc;border-radius:7px;pointer-events:none;z-index:3"></div>
+              <div id="ed-tl-sh" style="position:absolute;top:0;bottom:0;left:0;width:16px;background:linear-gradient(180deg,#7c5cfc,#5a3fc0);cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:7px 0 0 7px;z-index:10;user-select:none">
+                <div style="display:flex;gap:2px"><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div></div>
+              </div>
+              <div id="ed-tl-eh" style="position:absolute;top:0;bottom:0;right:0;width:16px;background:linear-gradient(180deg,#4f9cf9,#2563eb);cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:0 7px 7px 0;z-index:10;user-select:none">
+                <div style="display:flex;gap:2px"><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div></div>
+              </div>
             </div>
           </div>
-          <div style="position:relative;height:72px;margin:0 16px 12px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;cursor:col-resize" id="ed-timeline">
-            <div id="ed-tl-frames" style="position:absolute;inset:0;display:flex;align-items:stretch;gap:1px;padding:2px"></div>
-            <div id="ed-tl-selected" style="position:absolute;top:0;bottom:0;background:transparent;border:2px solid #7c5cfc;border-radius:4px;pointer-events:none"></div>
-            <div id="ed-tl-left-dark" style="position:absolute;top:0;bottom:0;left:0;background:rgba(0,0,0,0.6);pointer-events:none"></div>
-            <div id="ed-tl-right-dark" style="position:absolute;top:0;bottom:0;right:0;background:rgba(0,0,0,0.6);pointer-events:none"></div>
-            <div id="ed-tl-start-handle" style="position:absolute;top:0;bottom:0;width:16px;background:#7c5cfc;cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:4px 0 0 4px;z-index:10">
-              <div style="width:2px;height:24px;background:white;border-radius:1px"></div>
-            </div>
-            <div id="ed-tl-end-handle" style="position:absolute;top:0;bottom:0;width:16px;background:#4f9cf9;cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:0 4px 4px 0;z-index:10">
-              <div style="width:2px;height:24px;background:white;border-radius:1px"></div>
-            </div>
-            <div id="ed-tl-playhead" style="position:absolute;top:0;bottom:0;width:2px;background:white;pointer-events:none;z-index:11;display:none"></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:10px;color:var(--hint);width:40px;flex-shrink:0">Text</span>
+            <div id="ed-cap-track" style="flex:1;height:20px;background:rgba(255,255,255,0.03);border-radius:6px;position:relative;overflow:hidden"></div>
           </div>
-          <input type="range" id="ed-trim-start" min="0" max="100" value="0" style="display:none" oninput="edUpdateTrim()"/>
-          <input type="range" id="ed-trim-end" min="100" max="100" value="100" style="display:none" oninput="edUpdateTrim()"/>
         </div>
       </div>
-      <div class="epanel">
-        <div class="ptabs">
-          <div class="ptab on" onclick="switchPanel('captions')">&#128172; Captions</div>
-          <div class="ptab" onclick="switchPanel('style')">&#127912; Style</div>
-          <div class="ptab" onclick="switchPanel('info')">&#8505; Info</div>
+      <div style="width:272px;background:rgba(10,10,30,0.98);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0">
+        <div id="edpanel-text" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+          <div style="padding:12px;border-bottom:1px solid var(--border);flex-shrink:0">
+            <div style="font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:8px">Captions</div>
+            <button onclick="edAddCaption()" style="width:100%;padding:8px;background:rgba(124,92,252,0.12);border:1px dashed rgba(124,92,252,0.4);color:#c4b5fd;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">+ Add Caption</button>
+          </div>
+          <div id="ed-caps-list" style="flex:1;overflow-y:auto;padding:10px">
+            <div style="font-size:12px;color:var(--hint);text-align:center;padding:16px">No captions yet</div>
+          </div>
         </div>
-        <div class="pbody" id="panel-captions">
-          <div class="ailbl">Add captions</div>
-          <div id="ed-captions-list"></div>
-          <button onclick="edAddCaption()" style="width:100%;padding:10px;background:rgba(124,92,252,0.12);border:1px dashed rgba(124,92,252,0.4);color:#c4b5fd;border-radius:10px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px">+ Add Caption</button>
-        </div>
-        <div class="pbody" id="panel-style" style="display:none">
-          <div class="ailbl">Caption style</div>
-          <div style="margin-bottom:14px">
-            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Font</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <button class="fb on" onclick="edSetFont(this,'Syne')">Syne</button>
-              <button class="fb" onclick="edSetFont(this,'Impact')">Impact</button>
-              <button class="fb" onclick="edSetFont(this,\'DM Sans\')">Clean</button>
-              <button class="fb" onclick="edSetFont(this,'Arial Black')">Bold</button>
+        <div id="edpanel-style" style="flex:1;overflow-y:auto;padding:12px;display:none">
+          <div style="font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px">Caption Style</div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Font</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px" id="ed-font-grid">
+              <div class="edfont" onclick="edSetFont(this,'Syne')" style="padding:7px;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.4);border-radius:7px;text-align:center;cursor:pointer;font-size:12px;font-family:'Syne',sans-serif;font-weight:800;color:#c4b5fd">Viral</div>
+              <div class="edfont" onclick="edSetFont(this,'Impact')" style="padding:7px;background:var(--card);border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;font-size:12px;font-family:Impact,sans-serif;color:var(--muted)">IMPACT</div>
+              <div class="edfont" onclick="edSetFont(this,'DM Sans')" style="padding:7px;background:var(--card);border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--muted)">Clean</div>
+              <div class="edfont" onclick="edSetFont(this,'Georgia')" style="padding:7px;background:var(--card);border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;font-size:13px;font-family:Georgia,serif;color:var(--muted)">Elegant</div>
+              <div class="edfont" onclick="edSetFont(this,'Courier New')" style="padding:7px;background:var(--card);border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;font-size:11px;font-family:'Courier New',monospace;color:var(--muted)">Code</div>
+              <div class="edfont" onclick="edSetFont(this,'Arial Black')" style="padding:7px;background:var(--card);border:1px solid var(--border);border-radius:7px;text-align:center;cursor:pointer;font-size:11px;font-family:'Arial Black',sans-serif;color:var(--muted)">BLACK</div>
             </div>
           </div>
-          <div style="margin-bottom:14px">
-            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Text Color</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <div style="width:24px;height:24px;border-radius:50%;background:#fff;cursor:pointer;border:2px solid white" onclick="edSetColor('#fff')"></div>
-              <div style="width:24px;height:24px;border-radius:50%;background:#c4b5fd;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#c4b5fd')"></div>
-              <div style="width:24px;height:24px;border-radius:50%;background:#4de89a;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#4de89a')"></div>
-              <div style="width:24px;height:24px;border-radius:50%;background:#fcd34d;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#fcd34d')"></div>
-              <div style="width:24px;height:24px;border-radius:50%;background:#f87171;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#f87171')"></div>
-              <div style="width:24px;height:24px;border-radius:50%;background:#60a5fa;cursor:pointer;border:2px solid transparent" onclick="edSetColor('#60a5fa')"></div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Color</div>
+            <div style="display:flex;gap:7px;flex-wrap:wrap">
+              <div onclick="edSetColor('#ffffff')" style="width:26px;height:26px;border-radius:50%;background:#fff;cursor:pointer;border:3px solid rgba(255,255,255,0.5)"></div>
+              <div onclick="edSetColor('#fcd34d')" style="width:26px;height:26px;border-radius:50%;background:#fcd34d;cursor:pointer;border:2px solid transparent"></div>
+              <div onclick="edSetColor('#f87171')" style="width:26px;height:26px;border-radius:50%;background:#f87171;cursor:pointer;border:2px solid transparent"></div>
+              <div onclick="edSetColor('#4de89a')" style="width:26px;height:26px;border-radius:50%;background:#4de89a;cursor:pointer;border:2px solid transparent"></div>
+              <div onclick="edSetColor('#c4b5fd')" style="width:26px;height:26px;border-radius:50%;background:#c4b5fd;cursor:pointer;border:2px solid transparent"></div>
+              <div onclick="edSetColor('#60a5fa')" style="width:26px;height:26px;border-radius:50%;background:#60a5fa;cursor:pointer;border:2px solid transparent"></div>
+              <div onclick="edSetColor('#000000')" style="width:26px;height:26px;border-radius:50%;background:#000;cursor:pointer;border:2px solid var(--border2)"></div>
             </div>
           </div>
-          <div style="margin-bottom:14px">
-            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Font Size: <span id="ed-size-lbl">24px</span></div>
-            <input type="range" min="14" max="48" value="24" style="width:100%;accent-color:#7c5cfc" oninput="edSetSize(this.value)"/>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Size: <span id="ed-size-lbl" style="color:var(--p2)">24px</span></div>
+            <input type="range" min="12" max="56" value="24" style="width:100%;accent-color:#7c5cfc" oninput="edSetSize(this.value)"/>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Position</div>
+            <div style="display:flex;gap:5px">
+              <button class="fb" onclick="edSetPos(this,'top')" style="flex:1;text-align:center">Top</button>
+              <button class="fb" onclick="edSetPos(this,'center')" style="flex:1;text-align:center">Mid</button>
+              <button class="fb on" onclick="edSetPos(this,'bottom')" style="flex:1;text-align:center">Bot</button>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Background</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap">
+              <div class="edbg" onclick="edSetBg(this,'none')" style="padding:5px 9px;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.4);border-radius:6px;font-size:11px;color:#c4b5fd;cursor:pointer">None</div>
+              <div class="edbg" onclick="edSetBg(this,'dark')" style="padding:5px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);cursor:pointer">Dark</div>
+              <div class="edbg" onclick="edSetBg(this,'blur')" style="padding:5px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);cursor:pointer">Blur</div>
+              <div class="edbg" onclick="edSetBg(this,'color')" style="padding:5px 9px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);cursor:pointer">Purple</div>
+            </div>
+          </div>
+        </div>
+        <div id="edpanel-sticker" style="flex:1;overflow-y:auto;padding:12px;display:none">
+          <div style="font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px">Stickers</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px" id="ed-sticker-grid"></div>
+        </div>
+        <div id="edpanel-filter" style="flex:1;overflow-y:auto;padding:12px;display:none">
+          <div style="font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px">Filters</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px" id="ed-filter-grid"></div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Brightness: <span id="ed-bright-lbl" style="color:var(--p2)">100%</span></div>
+            <input type="range" min="50" max="150" value="100" style="width:100%;accent-color:#7c5cfc" oninput="edBright(this.value)"/>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Contrast: <span id="ed-contrast-lbl" style="color:var(--p2)">100%</span></div>
+            <input type="range" min="50" max="150" value="100" style="width:100%;accent-color:#7c5cfc" oninput="edContrast(this.value)"/>
           </div>
           <div>
-            <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px">Position</div>
-            <div style="display:flex;gap:6px">
-              <button class="fb" onclick="edSetPos(this,'top')">Top</button>
-              <button class="fb" onclick="edSetPos(this,'center')">Center</button>
-              <button class="fb on" onclick="edSetPos(this,'bottom')">Bottom</button>
-            </div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Saturation: <span id="ed-sat-lbl" style="color:var(--p2)">100%</span></div>
+            <input type="range" min="0" max="200" value="100" style="width:100%;accent-color:#7c5cfc" oninput="edSat(this.value)"/>
           </div>
         </div>
-        <div class="pbody" id="panel-info" style="display:none">
-          <div class="ailbl">Clip info</div>
-          <div id="ed-clip-info" style="font-size:13px;color:var(--muted);line-height:1.8">
-            <div>No clip loaded</div>
-          </div>
-          <div style="margin-top:16px">
-            <div style="font-size:11px;color:var(--hint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">Watch on YouTube</div>
-            <a id="ed-yt-link" href="#" target="_blank" style="display:block;background:rgba(255,0,0,0.12);border:1px solid rgba(255,0,0,0.3);color:#f87171;padding:10px 14px;border-radius:10px;font-size:13px;text-decoration:none;text-align:center">&#9654; Open in YouTube</a>
-          </div>
-          <div style="margin-top:12px">
-            <div style="font-size:11px;color:var(--hint);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600">Edit in YouTube Studio</div>
-            <a id="ed-studio-link" href="#" target="_blank" style="display:block;background:rgba(124,92,252,0.12);border:1px solid rgba(124,92,252,0.3);color:#c4b5fd;padding:10px 14px;border-radius:10px;font-size:13px;text-decoration:none;text-align:center">&#9986; Open in Studio</a>
+        <div id="edpanel-info" style="flex:1;overflow-y:auto;padding:12px;display:none">
+          <div style="font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:10px">Clip Info</div>
+          <div id="ed-info-text" style="font-size:12px;color:var(--muted);line-height:2">No clip loaded</div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+            <a id="ed-yt-link" href="#" target="_blank" style="display:block;background:rgba(255,0,0,0.1);border:1px solid rgba(255,0,0,0.25);color:#f87171;padding:8px;border-radius:8px;font-size:12px;text-decoration:none;text-align:center">&#9654; Watch on YouTube</a>
+            <a id="ed-studio-link" href="#" target="_blank" style="display:block;background:rgba(124,92,252,0.1);border:1px solid rgba(124,92,252,0.25);color:#c4b5fd;padding:8px;border-radius:8px;font-size:12px;text-decoration:none;text-align:center">&#9986; Open in Studio</a>
           </div>
         </div>
       </div>
     </div>
   </div>
+
   <div id="sp-coach">
     <div class="ctop">
       <div class="chdr"><div class="cav2">&#9889;</div><div><div class="cname">REV AI Coach</div><div class="cstat">&#9679; Online - ready to help you grow</div></div></div>
@@ -768,7 +825,6 @@ async function doLogin(){
     document.getElementById('pg-login').classList.remove('active');
     document.getElementById('pg-app').classList.add('active');
     showSub('dash',document.querySelectorAll('.ntab')[0]);
-    loadDashStats();
   }catch(e){document.getElementById('li-err').textContent='Login failed. Try again.'}
 }
 function doLogout(){document.getElementById('pg-app').classList.remove('active');document.getElementById('pg-login').classList.add('active');document.getElementById('dd').style.display='none';document.getElementById('li-err').textContent='';document.getElementById('em').value='';document.getElementById('pw').value='';currentUser=null;sb.auth.signOut()}
@@ -785,19 +841,13 @@ function renderClipsGrid(clips,count){
   var colors=['t1','t2','t3'];
   var showing=clips.slice(0,count);
   var html=showing.map(function(clip,i){
-    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn post" onclick="edOpenById('+clip.id+')" style="background:rgba(79,156,249,0.15);border-color:rgba(79,156,249,0.32);color:#7fbdff">&#9986; Edit</button><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
+    return '<div class="cc"><div class="ct '+colors[i%3]+'" style="flex-direction:column;gap:8px;padding:16px;align-items:center;justify-content:center"><div class="csc '+(clip.viral_score>=85?'sh':'sm')+'">'+clip.viral_score+'/100</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_start+'</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">to</div><div style="font-family:Syne,sans-serif;font-size:20px;color:white;font-weight:800">'+clip.timestamp_end+'</div></div><div class="cb"><div class="ctl">'+clip.clip_title+'</div><div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+clip.reason+'</div><div style="font-size:10px;color:var(--hint);margin-bottom:8px">'+clip.video_title+'</div><div class="cm"><div class="cbs"><a href="'+clip.youtube_url+'" target="_blank"><button class="cbtn post">&#9654; Watch</button></a><button class="cbtn edit" onclick="deleteClip('+clip.id+',this)">&#128465; Delete</button></div></div></div></div>';
   }).join('');
-  var btns='<div style="grid-column:1/-1;text-align:center;padding:16px;display:flex;gap:10px;justify-content:center">';
   if(clips.length>count){
     var nextCount=count===6?20:clips.length;
-    var label=count===6?'Show More':'Show All';
-    btns+='<button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button>';
+    var label=count===6?'Show More ('+Math.min(20,clips.length)+')':'Show All ('+clips.length+')';
+    html+='<div style="grid-column:1/-1;text-align:center;padding:16px"><button onclick="renderClipsGrid(allClipsCache,'+nextCount+')" style="background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+label+' &#9660;</button></div>';
   }
-  if(count>6){
-    btns+='<button onclick="renderClipsGrid(allClipsCache,6)" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px 24px;border-radius:10px;font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">Show Less &#9650;</button>';
-  }
-  btns+='</div>';
-  if(clips.length>count||count>6)html+=btns;
   grid.innerHTML=html;
 }
 
@@ -831,231 +881,358 @@ document.addEventListener('click',function(e){var dd=document.getElementById('cl
 async function deleteClip(id,btn){if(!confirm('Delete this clip?'))return;await fetch(BACKEND_URL+'/api/delete-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})});loadSavedClips();}
 
 // EDITOR
-var edClip=null;
-var edCaptions=[];
-var edFont='Syne';
-var edColor='#fff';
-var edSize=24;
-var edPos='bottom';
-var edCapPreview=false;
+var edClip=null,edCaptions=[],edFont='Syne',edColor='#ffffff',edSize=24,edPos='bottom',edBg='none',edCapPreview=false,edActiveCap=-1,edBrVal=100,edConVal=100,edSatVal=100;
+var edStickers=['🔥','🎉','✨','👏','😂','🤯','👌','🤔','😱','💯','🏆','⚡','🤩','😈','👾','❤️','👑','🔴','🟢','🟣'];
 
 function edOpenById(id){
-  var clip=allClipsCache.find(function(c){return String(c.id)===String(id)});
+  var clip=allClipsCache.find(function(c){return String(c.id)===String(id);});
   if(clip)openEditor(clip);
 }
 
 function openEditor(clip){
   edClip=clip||null;
   showSub('editor',document.querySelectorAll('.ntab')[2]);
-  if(edClip)edLoadClip();
+  if(edClip){setTimeout(function(){edLoadClip();},80);}
 }
+
+function edTs(ts){if(!ts)return 0;var p=ts.split(':');return p.length===2?parseInt(p[0]||0)*60+parseInt(p[1]||0):p.length===3?parseInt(p[0]||0)*3600+parseInt(p[1]||0)*60+parseInt(p[2]||0):0;}
+function edSec(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
+function edVid(){return document.getElementById('ed-video');}
+function edYt(){return document.getElementById('ed-yt');}
 
 function edLoadClip(){
   if(!edClip)return;
   document.getElementById('ed-no-clip').style.display='none';
   document.getElementById('ed-yt-wrap').style.display='block';
-  document.getElementById('ed-clip-name').textContent='- '+edClip.clip_title;
-  var videoId=edGetVideoId(edClip.youtube_url||'');
-  var startSec=edTsToSec(edClip.timestamp_start||'0:00');
-  var endSec=edTsToSec(edClip.timestamp_end||'0:45');
-  var duration=endSec-startSec;
-  if(videoId){
-    document.getElementById('ed-yt').src='https://www.youtube.com/embed/'+videoId+'?start='+startSec+'&end='+endSec+'&autoplay=0&controls=1&modestbranding=1&rel=0';
-  }
-  document.getElementById('ed-trim-start').min=0;
-  document.getElementById('ed-trim-start').max=duration;
-  document.getElementById('ed-trim-start').value=0;
-  document.getElementById('ed-trim-end').min=0;
-  document.getElementById('ed-trim-end').max=duration;
-  document.getElementById('ed-trim-end').value=duration;
-  document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec);
-  document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(endSec);
-  document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(duration);
-  document.getElementById('ed-yt-link').href=edClip.youtube_url||'#';
-  document.getElementById('ed-studio-link').href=edClip.studio_url||'#';
-  document.getElementById('ed-clip-info').innerHTML='<div><b style="color:var(--text)">Title:</b> '+edClip.clip_title+'</div><div><b style="color:var(--text)">Video:</b> '+(edClip.video_title||'Unknown')+'</div><div><b style="color:var(--text)">Timestamps:</b> '+edClip.timestamp_start+' - '+edClip.timestamp_end+'</div><div><b style="color:var(--text)">Viral Score:</b> <span style="color:#4de89a">'+edClip.viral_score+'/100</span></div>';
-  edGenerateWaveform(duration);
-  setTimeout(function(){edInitTimeline(duration);},100);
-  edCaptions=[];
-  edRenderCaptions();
-  edUpdateTrim();
+  document.getElementById('ed-file-wrap').style.display='none';
+  document.getElementById('ed-clip-name').textContent=edClip.clip_title||'Clip';
+  var m=( edClip.youtube_url||'').match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  var vid=m?m[1]:'';
+  var s=edTs(edClip.timestamp_start||'0:00');
+  var e=edTs(edClip.timestamp_end||'0:45');
+  var dur=Math.max(1,e-s);
+  if(vid)document.getElementById('ed-yt').src='https://www.youtube.com/embed/'+vid+'?start='+s+'&end='+e+'&autoplay=0&controls=1&modestbranding=1&rel=0';
+  document.getElementById('ed-start-lbl').textContent=edSec(s);
+  document.getElementById('ed-end-lbl').textContent=edSec(e);
+  document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(dur);
+  var yl=document.getElementById('ed-yt-link');if(yl)yl.href=edClip.youtube_url||'#';
+  var sl=document.getElementById('ed-studio-link');if(sl)sl.href=edClip.studio_url||'#';
+  document.getElementById('ed-info-text').innerHTML='<div><b style="color:var(--text)">Title</b><br>'+edClip.clip_title+'</div><div style="margin-top:6px"><b style="color:var(--text)">Video</b><br>'+(edClip.video_title||'Unknown')+'</div><div style="margin-top:6px"><b style="color:var(--text)">Timestamps</b><br>'+edClip.timestamp_start+' to '+edClip.timestamp_end+'</div><div style="margin-top:6px"><b style="color:var(--text)">Viral Score</b><br><span style="color:#4de89a;font-size:20px;font-weight:800">'+edClip.viral_score+'/100</span></div>';
+  edCaptions=[];edActiveCap=-1;
+  edRenderCaps();
+  setTimeout(function(){edInitTL(dur,s);edInitStickers();edInitFilters();},100);
 }
 
-function edGetVideoId(url){var m=url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);return m?m[1]:'';}
-function edTsToSec(ts){var p=ts.split(':');if(p.length===2)return parseInt(p[0])*60+parseInt(p[1]);if(p.length===3)return parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);return 0;}
-function edSecToTs(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
+function edImportFile(input){
+  if(!input.files||!input.files[0])return;
+  var url=URL.createObjectURL(input.files[0]);
+  document.getElementById('ed-no-clip').style.display='none';
+  document.getElementById('ed-yt-wrap').style.display='none';
+  document.getElementById('ed-file-wrap').style.display='block';
+  var v=edVid();v.src=url;
+  document.getElementById('ed-clip-name').textContent=input.files[0].name.replace(/\.[^.]+$/,'');
+  v.onloadedmetadata=function(){
+    var dur=v.duration||30;
+    document.getElementById('ed-start-lbl').textContent=edSec(0);
+    document.getElementById('ed-end-lbl').textContent=edSec(dur);
+    document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(dur);
+    edCaptions=[];edActiveCap=-1;edRenderCaps();
+    setTimeout(function(){edInitTL(dur,0);edInitStickers();edInitFilters();},100);
+    v.ontimeupdate=function(){edPlayhead(v.currentTime,dur);};
+  };
+}
 
-function edInitTimeline(duration){
-  var tl=document.getElementById('ed-timeline');
-  var startH=document.getElementById('ed-tl-start-handle');
-  var endH=document.getElementById('ed-tl-end-handle');
-  var tlW=tl.offsetWidth;
-  var trimStart=0;
-  var trimEnd=duration;
+function edInitTL(duration,startSec){
+  var tl=document.getElementById('ed-timeline');if(!tl)return;
+  var tlW=tl.offsetWidth||500;
+  var sh=document.getElementById('ed-tl-sh');
+  var eh=document.getElementById('ed-tl-eh');
+  var trimS=0,trimE=duration;
 
-  function pct(sec){return Math.max(0,Math.min(100,sec/duration*100));}
-  function secFromX(x){return Math.max(0,Math.min(duration,x/tlW*duration));}
-
-  function renderFrames(){
-    var frames=document.getElementById('ed-tl-frames');
-    var count=Math.round(tlW/8);
-    var html='';
-    for(var i=0;i<count;i++){
-      var h=30+Math.random()*40;
-      var bright=0.3+Math.random()*0.5;
-      html+='<div style="flex:1;height:'+h+'%;align-self:center;background:rgba(124,92,252,'+bright+');border-radius:1px;min-width:3px"></div>';
-    }
-    frames.innerHTML=html;
+  var bars=document.getElementById('ed-tl-bars');
+  if(bars){
+    var n=Math.round(tlW/5);var h='';
+    for(var i=0;i<n;i++){var ht=20+Math.sin(i*0.5)*12+Math.random()*28;var a=0.35+Math.random()*0.5;var c=Math.random()>0.6?'79,156,249':'124,92,252';h+='<div style="flex:1;height:'+ht+'%;align-self:center;background:rgba('+c+','+a+');border-radius:1px;min-width:2px"></div>';}
+    bars.innerHTML=h;
   }
 
+  function pct(s){return Math.max(0,Math.min(100,s/duration*100));}
+  function fromX(x){return Math.max(0,Math.min(duration,x/tlW*duration));}
   function update(){
-    var sp=pct(trimStart);
-    var ep=pct(trimEnd);
-    startH.style.left=sp+'%';
-    endH.style.left='calc('+ep+'% - 16px)';
-    document.getElementById('ed-tl-left-dark').style.width=sp+'%';
-    document.getElementById('ed-tl-right-dark').style.width=(100-ep)+'%';
-    document.getElementById('ed-tl-selected').style.left=sp+'%';
-    document.getElementById('ed-tl-selected').style.right=(100-ep)+'%';
-    var startSec=edTsToSec(edClip.timestamp_start||'0:00');
-    document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec+trimStart);
-    document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(startSec+trimEnd);
-    document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(trimEnd-trimStart);
-    document.getElementById('ed-trim-start').value=trimStart;
-    document.getElementById('ed-trim-end').value=trimEnd;
+    var sp=pct(trimS),ep=pct(trimE);
+    sh.style.left=sp+'%';
+    eh.style.right=(100-ep)+'%';
+    document.getElementById('ed-tl-ldark').style.width=sp+'%';
+    document.getElementById('ed-tl-rdark').style.width=(100-ep)+'%';
+    var b=document.getElementById('ed-tl-border');
+    if(b){b.style.left=sp+'%';b.style.right=(100-ep)+'%';}
+    document.getElementById('ed-start-lbl').textContent=edSec(startSec+trimS);
+    document.getElementById('ed-end-lbl').textContent=edSec(startSec+trimE);
+    document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(trimE-trimS);
+    edRenderCapTrack(duration);
   }
-
-  renderFrames();
-  update();
-
-  function makeDraggable(handle,isStart){
+  function drag(handle,isStart){
+    function go(cx){
+      var rect=tl.getBoundingClientRect();
+      var sec=fromX(cx-rect.left);
+      if(isStart){trimS=Math.max(0,Math.min(sec,trimE-1));}
+      else{trimE=Math.min(duration,Math.max(sec,trimS+1));}
+      update();
+    }
     handle.addEventListener('mousedown',function(e){
       e.preventDefault();
-      var rect=tl.getBoundingClientRect();
-      function onMove(e){
-        var x=e.clientX-rect.left;
-        var sec=secFromX(x);
-        if(isStart){trimStart=Math.min(sec,trimEnd-2);}
-        else{trimEnd=Math.max(sec,trimStart+2);}
-        update();
-      }
-      function onUp(){
-        document.removeEventListener('mousemove',onMove);
-        document.removeEventListener('mouseup',onUp);
-      }
-      document.addEventListener('mousemove',onMove);
-      document.addEventListener('mouseup',onUp);
+      var mm=function(e){go(e.clientX);};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
     handle.addEventListener('touchstart',function(e){
-      var rect=tl.getBoundingClientRect();
-      function onMove(e){
-        var x=e.touches[0].clientX-rect.left;
-        var sec=secFromX(x);
-        if(isStart){trimStart=Math.min(sec,trimEnd-2);}
-        else{trimEnd=Math.max(sec,trimStart+2);}
-        update();
-      }
-      function onUp(){
-        document.removeEventListener('touchmove',onMove);
-        document.removeEventListener('touchend',onUp);
-      }
-      document.addEventListener('touchmove',onMove,{passive:true});
-      document.addEventListener('touchend',onUp);
+      var tm=function(e){go(e.touches[0].clientX);};
+      var tu=function(){document.removeEventListener('touchmove',tm);document.removeEventListener('touchend',tu);};
+      document.addEventListener('touchmove',tm,{passive:true});document.addEventListener('touchend',tu);
     },{passive:true});
   }
-
-  makeDraggable(startH,true);
-  makeDraggable(endH,false);
+  drag(sh,true);drag(eh,false);update();
 }
 
-function edUpdateTrim(){}
-
-function edGenerateWaveform(duration){
-  var bars=document.getElementById('ed-waveform-bars');
-  var msg=document.getElementById('ed-waveform-msg');
-  msg.style.display='none';
-  var count=Math.min(80,Math.max(20,Math.round(duration*1.5)));
-  var html='';
-  for(var i=0;i<count;i++){var h=20+Math.random()*60;var alpha=0.4+Math.random()*0.6;var color=Math.random()>0.7?'79,156,249':'124,92,252';html+='<div style="flex:1;height:'+h+'%;background:rgba('+color+','+alpha+');border-radius:1px;min-width:2px"></div>';}
-  bars.innerHTML=html;
+function edPlayhead(t,dur){
+  var ph=document.getElementById('ed-tl-ph');
+  if(!ph||!dur)return;
+  ph.style.left=Math.min(100,t/dur*100)+'%';
 }
 
-function edAddCaption(){var id=Date.now();edCaptions.push({id:id,text:'Caption text',start:'0:00',end:'0:05'});edRenderCaptions();}
+function edAddCaption(){
+  var id=Date.now();
+  var s=edClip?edTs(edClip.timestamp_start||'0:00'):0;
+  edCaptions.push({id:id,text:'Your caption',start:edSec(s),end:edSec(s+5),font:edFont,color:edColor,size:edSize,pos:edPos,bg:edBg});
+  edRenderCaps();edRenderCapTrack();
+}
 
-function edRenderCaptions(){
-  var list=document.getElementById('ed-captions-list');
-  if(edCaptions.length===0){list.innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:16px">No captions yet. Click Add Caption below.</div>';return;}
-  list.innerHTML=edCaptions.map(function(cap){
-    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:8px">'
-      +'<div style="display:flex;gap:6px;margin-bottom:8px">'
-      +'<input value="'+cap.start+'" onchange="edUpdateCap('+cap.id+',\'start\',this.value)" style="width:52px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;font-size:11px;color:var(--text);font-family:monospace;text-align:center"/>'
-      +'<span style="color:var(--hint);font-size:11px;line-height:26px">to</span>'
-      +'<input value="'+cap.end+'" onchange="edUpdateCap('+cap.id+',\'end\',this.value)" style="width:52px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:6px;padding:4px 6px;font-size:11px;color:var(--text);font-family:monospace;text-align:center"/>'
-      +'<button onclick="edDeleteCap('+cap.id+')" style="margin-left:auto;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:#f87171;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer">\u{1F5D1}</button>'
+function edRenderCaps(){
+  var list=document.getElementById('ed-caps-list');if(!list)return;
+  if(edCaptions.length===0){list.innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:16px">No captions yet</div>';return;}
+  list.innerHTML=edCaptions.map(function(cap,i){
+    var active=edActiveCap===i;
+    return '<div onclick="edSelCap('+i+')" style="background:var(--card);border:1px solid '+(active?'rgba(124,92,252,0.5)':'var(--border)')+';border-radius:9px;padding:9px;margin-bottom:7px;cursor:pointer">'
+      +'<div style="display:flex;gap:5px;margin-bottom:6px;align-items:center">'
+      +'<input value="'+cap.start+'" onchange="edCapField('+cap.id+',\'start\',this.value)" onclick="event.stopPropagation()" style="width:46px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:5px;padding:3px 5px;font-size:11px;color:var(--p2);font-family:monospace;text-align:center"/>'
+      +'<span style="color:var(--hint);font-size:10px">to</span>'
+      +'<input value="'+cap.end+'" onchange="edCapField('+cap.id+',\'end\',this.value)" onclick="event.stopPropagation()" style="width:46px;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:5px;padding:3px 5px;font-size:11px;color:var(--b);font-family:monospace;text-align:center"/>'
+      +'<button onclick="edDelCap('+cap.id+');event.stopPropagation()" style="margin-left:auto;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);color:#f87171;padding:3px 7px;border-radius:5px;font-size:10px;cursor:pointer">&#128465;</button>'
       +'</div>'
-      +'<textarea onchange="edUpdateCap('+cap.id+',\'text\',this.value)" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:7px;padding:7px 10px;font-size:13px;color:var(--text);font-family:\'DM Sans\',sans-serif;outline:none;resize:none" rows="2">'+cap.text+'</textarea>'
+      +'<textarea onchange="edCapField('+cap.id+',\'text\',this.value)" onclick="event.stopPropagation()" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--text);font-family:'+cap.font+',sans-serif;outline:none;resize:none;box-sizing:border-box" rows="2">'+cap.text+'</textarea>'
       +'</div>';
   }).join('');
 }
 
-function edUpdateCap(id,field,val){edCaptions=edCaptions.map(function(c){if(c.id===id)c[field]=val;return c});}
-function edDeleteCap(id){edCaptions=edCaptions.filter(function(c){return c.id!==id});edRenderCaptions();}
-function edSetFont(btn,font){edFont=font;btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');document.getElementById('ed-cap-text').style.fontFamily=font;}
-function edSetColor(color){edColor=color;document.getElementById('ed-cap-text').style.color=color;}
-function edSetSize(v){edSize=parseInt(v);document.getElementById('ed-size-lbl').textContent=v+'px';document.getElementById('ed-cap-text').style.fontSize=v+'px';}
-function edSetPos(btn,pos){edPos=pos;btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');var ov=document.getElementById('ed-cap-overlay');if(pos==='top'){ov.style.bottom='auto';ov.style.top='60px';}else if(pos==='center'){ov.style.bottom='auto';ov.style.top='50%';}else{ov.style.top='auto';ov.style.bottom='60px';}}
-function edPreviewCaptions(){edCapPreview=!edCapPreview;var ov=document.getElementById('ed-cap-overlay');var ct=document.getElementById('ed-cap-text');if(edCapPreview&&edCaptions.length>0){ov.style.display='block';ct.textContent=edCaptions[0].text;ct.style.fontFamily=edFont;ct.style.color=edColor;ct.style.fontSize=edSize+'px';}else{ov.style.display='none';edCapPreview=false;}}
-function edReset(){edClip=null;edCaptions=[];document.getElementById('ed-no-clip').style.display='flex';document.getElementById('ed-yt-wrap').style.display='none';document.getElementById('ed-yt').src='';document.getElementById('ed-clip-name').textContent='- No clip loaded';document.getElementById('ed-waveform-bars').innerHTML='';document.getElementById('ed-waveform-msg').style.display='flex';edRenderCaptions();}
-function edExport(){if(!edClip){alert('No clip loaded!');return;}var startSec=edTsToSec(edClip.timestamp_start||'0:00');var s=parseFloat(document.getElementById('ed-trim-start').value)||0;var e=parseFloat(document.getElementById('ed-trim-end').value)||45;var trimStart=edSecToTs(startSec+s);var trimEnd=edSecToTs(startSec+e);var info='Clip: '+edClip.clip_title+'\nTrim: '+trimStart+' to '+trimEnd+'\nDuration: '+edSecToTs(e-s)+'\nYouTube: '+edClip.youtube_url+'\nStudio: '+edClip.studio_url+'\n\nCaptions:\n'+edCaptions.map(function(c){return c.start+'-'+c.end+': '+c.text}).join('\n');alert(info);}
-function switchPanel(n){['captions','style','info'].forEach(function(p){var el=document.getElementById('panel-'+p);if(el)el.style.display=p===n?'block':'none'});document.querySelectorAll('.ptab').forEach(function(t,i){t.classList.toggle('on',['captions','style','info'][i]===n)})}
+function edSelCap(i){
+  edActiveCap=i;edRenderCaps();
+  var cap=edCaptions[i];if(!cap)return;
+  edApplyCap(cap);
+  var ov=document.getElementById('ed-cap-overlay');if(ov)ov.style.display='block';
+  edPosCaption(cap.pos);
+}
+
+function edApplyCap(cap){
+  var ct=document.getElementById('ed-cap-text');
+  var ct2=document.getElementById('ed-file-cap-text');
+  [ct,ct2].forEach(function(el){
+    if(!el)return;
+    el.textContent=cap.text;
+    el.style.fontFamily=cap.font+',sans-serif';
+    el.style.color=cap.color;
+    el.style.fontSize=cap.size+'px';
+    el.style.textShadow='2px 2px 0 #000';
+    if(cap.bg==='dark'){el.style.background='rgba(0,0,0,0.6)';el.style.padding='5px 14px';el.style.borderRadius='8px';}
+    else if(cap.bg==='blur'){el.style.background='rgba(0,0,0,0.3)';el.style.backdropFilter='blur(8px)';el.style.padding='5px 14px';el.style.borderRadius='8px';}
+    else if(cap.bg==='color'){el.style.background='rgba(124,92,252,0.65)';el.style.padding='5px 14px';el.style.borderRadius='8px';}
+    else{el.style.background='transparent';el.style.padding='0';}
+  });
+  if(ct2)ct2.style.display='inline-block';
+}
+
+function edPosCaption(pos){
+  var ov=document.getElementById('ed-cap-overlay');
+  var ov2=document.getElementById('ed-file-cap-overlay');
+  [ov,ov2].forEach(function(el){
+    if(!el)return;
+    el.style.transform='';
+    if(pos==='top'){el.style.bottom='auto';el.style.top='40px';}
+    else if(pos==='center'){el.style.bottom='auto';el.style.top='50%';el.style.transform='translateY(-50%)';}
+    else{el.style.top='auto';el.style.bottom='55px';}
+  });
+}
+
+function edCapField(id,field,val){
+  edCaptions=edCaptions.map(function(c){if(c.id===id)c[field]=val;return c;});
+  edRenderCapTrack();
+}
+function edDelCap(id){
+  edCaptions=edCaptions.filter(function(c){return c.id!==id;});
+  edActiveCap=-1;edRenderCaps();edRenderCapTrack();
+  var ov=document.getElementById('ed-cap-overlay');if(ov)ov.style.display='none';
+  var ct2=document.getElementById('ed-file-cap-text');if(ct2)ct2.style.display='none';
+}
+
+function edRenderCapTrack(duration){
+  var track=document.getElementById('ed-cap-track');if(!track)return;
+  var dur=duration||parseFloat((document.getElementById('ed-dur-lbl')||{}).textContent)||45;
+  var startSec=edClip?edTs(edClip.timestamp_start||'0:00'):0;
+  var colors=['#7c5cfc','#4f9cf9','#22d47e','#f97316','#f87171','#a78bfa'];
+  track.innerHTML=edCaptions.map(function(cap,i){
+    var s=Math.max(0,edTs(cap.start)-startSec);
+    var e=Math.max(s+0.5,edTs(cap.end)-startSec);
+    if(dur<=0)return '';
+    var lp=Math.max(0,s/dur*100);
+    var rp=Math.max(0,100-e/dur*100);
+    return '<div onclick="edSelCap('+i+')" title="'+cap.text+'" style="position:absolute;top:2px;bottom:2px;left:'+lp+'%;right:'+rp+'%;background:'+colors[i%colors.length]+';border-radius:3px;cursor:pointer;overflow:hidden;display:flex;align-items:center;padding:0 3px"><span style="font-size:9px;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+cap.text+'</span></div>';
+  }).join('');
+}
+
+function edSetFont(el,font){
+  edFont=font;
+  document.querySelectorAll('.edfont').forEach(function(e){e.style.background='var(--card)';e.style.borderColor='var(--border)';e.style.color='var(--muted)';});
+  el.style.background='rgba(124,92,252,0.15)';el.style.borderColor='rgba(124,92,252,0.4)';el.style.color='#c4b5fd';
+  if(edActiveCap>=0&&edCaptions[edActiveCap]){edCaptions[edActiveCap].font=font;edSelCap(edActiveCap);}
+}
+function edSetColor(c){
+  edColor=c;
+  if(edActiveCap>=0&&edCaptions[edActiveCap]){edCaptions[edActiveCap].color=c;edSelCap(edActiveCap);}
+  var ct=document.getElementById('ed-cap-text');if(ct)ct.style.color=c;
+}
+function edSetSize(v){
+  edSize=parseInt(v);
+  var lbl=document.getElementById('ed-size-lbl');if(lbl)lbl.textContent=v+'px';
+  if(edActiveCap>=0&&edCaptions[edActiveCap]){edCaptions[edActiveCap].size=edSize;edSelCap(edActiveCap);}
+  var ct=document.getElementById('ed-cap-text');if(ct)ct.style.fontSize=v+'px';
+  var ct2=document.getElementById('ed-file-cap-text');if(ct2)ct2.style.fontSize=v+'px';
+}
+function edSetPos(btn,pos){
+  edPos=pos;
+  btn.closest('div').querySelectorAll('.fb').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  if(edActiveCap>=0&&edCaptions[edActiveCap]){edCaptions[edActiveCap].pos=pos;edSelCap(edActiveCap);}
+  edPosCaption(pos);
+}
+function edSetBg(el,bg){
+  edBg=bg;
+  document.querySelectorAll('.edbg').forEach(function(e){e.style.background='var(--card)';e.style.borderColor='var(--border)';e.style.color='var(--muted)';});
+  el.style.background='rgba(124,92,252,0.15)';el.style.borderColor='rgba(124,92,252,0.4)';el.style.color='#c4b5fd';
+  if(edActiveCap>=0&&edCaptions[edActiveCap]){edCaptions[edActiveCap].bg=bg;edSelCap(edActiveCap);}
+}
+
+function edBright(v){edBrVal=parseInt(v);document.getElementById('ed-bright-lbl').textContent=v+'%';edApplyFilters();}
+function edContrast(v){edConVal=parseInt(v);document.getElementById('ed-contrast-lbl').textContent=v+'%';edApplyFilters();}
+function edSat(v){edSatVal=parseInt(v);document.getElementById('ed-sat-lbl').textContent=v+'%';edApplyFilters();}
+function edApplyFilters(){
+  var f='brightness('+edBrVal+'%) contrast('+edConVal+'%) saturate('+edSatVal+'%)';
+  var v=edVid();if(v)v.style.filter=f;
+  var y=edYt();if(y)y.style.filter=f;
+}
+
+function edInitFilters(){
+  var g=document.getElementById('ed-filter-grid');if(!g||g.children.length>0)return;
+  var fs=[{n:'None',v:''},{n:'Vivid',v:'saturate(150%) contrast(110%)'},{n:'Cool',v:'hue-rotate(30deg) saturate(120%)'},{n:'Warm',v:'hue-rotate(-20deg) saturate(130%) brightness(108%)'},{n:'B&W',v:'grayscale(100%)'},{n:'Fade',v:'brightness(112%) contrast(85%) saturate(75%)'},{n:'Crisp',v:'contrast(125%) saturate(110%)'},{n:'Dream',v:'brightness(108%) saturate(85%)'}];
+  g.innerHTML=fs.map(function(f,i){
+    return '<div onclick="edPickFilter('+i+')" data-fi="'+i+'" style="background:var(--card);border:1px solid var(--border);border-radius:7px;padding:9px 5px;text-align:center;cursor:pointer;font-size:11px;color:var(--muted)">'+f.n+'</div>';
+  }).join('');
+  window._edFilters=fs;
+}
+function edPickFilter(i){
+  var fs=window._edFilters||[];
+  document.querySelectorAll('#ed-filter-grid div').forEach(function(e){e.style.background='var(--card)';e.style.borderColor='var(--border)';e.style.color='var(--muted)';});
+  var el=document.querySelector('#ed-filter-grid div[data-fi="'+i+'"]');
+  if(el){el.style.background='rgba(124,92,252,0.15)';el.style.borderColor='rgba(124,92,252,0.4)';el.style.color='#c4b5fd';}
+  var val=(fs[i]||{}).v||'';
+  var v=edVid();if(v)v.style.filter=val;
+  var y=edYt();if(y)y.style.filter=val;
+}
+
+function edInitStickers(){
+  var g=document.getElementById('ed-sticker-grid');if(!g||g.children.length>0)return;
+  g.innerHTML=edStickers.map(function(s,i){
+    return '<div onclick="edPlaceSticker('+i+')" style="font-size:22px;cursor:pointer;text-align:center;padding:5px;border-radius:7px;border:1px solid transparent" onmouseover="this.style.background=\'var(--card2)\'" onmouseout="this.style.background=\'transparent\'">'+s+'</div>';
+  }).join('');
+}
+function edPlaceSticker(i){
+  var emoji=edStickers[i]||'✨';
+  var wrap=document.getElementById('ed-yt-wrap');
+  if(document.getElementById('ed-file-wrap').style.display!=='none')wrap=document.getElementById('ed-file-wrap');
+  if(!wrap)return;
+  var s=document.createElement('div');
+  s.textContent=emoji;
+  s.style.cssText='position:absolute;font-size:44px;cursor:move;user-select:none;top:30%;left:35%;z-index:20;line-height:1';
+  s.title='Drag me! Double-click to remove.';
+  s.addEventListener('dblclick',function(){s.remove();});
+  s.addEventListener('mousedown',function(e){
+    e.preventDefault();
+    var ox=e.clientX-s.offsetLeft,oy=e.clientY-s.offsetTop;
+    var mm=function(e){s.style.left=(e.clientX-ox)+'px';s.style.top=(e.clientY-oy)+'px';};
+    var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+    document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+  });
+  wrap.appendChild(s);
+}
+
+function edTool(name){
+  ['text','style','sticker','filter','info'].forEach(function(t){
+    var btn=document.getElementById('edtool-'+t);
+    var panel=document.getElementById('edpanel-'+t);
+    var isActive=t===name;
+    if(btn){btn.style.background=isActive?'rgba(124,92,252,0.18)':'transparent';btn.style.border=isActive?'1px solid rgba(124,92,252,0.35)':'1px solid transparent';var lbl=btn.querySelector('div:last-child');if(lbl)lbl.style.color=isActive?'#c4b5fd':'var(--muted)';}
+    if(panel)panel.style.display=isActive?'flex':'none';
+    if(isActive&&panel)panel.style.flexDirection='column';
+  });
+}
+
+function edTogglePreview(){
+  edCapPreview=!edCapPreview;
+  var btn=document.getElementById('ed-preview-btn');
+  var ov=document.getElementById('ed-cap-overlay');
+  var ct=document.getElementById('ed-cap-text');
+  if(edCapPreview&&edCaptions.length>0){
+    var cap=edCaptions[edActiveCap>=0?edActiveCap:0];
+    edApplyCap(cap);edPosCaption(cap.pos);
+    if(ov)ov.style.display='block';
+    if(btn){btn.style.background='rgba(34,212,126,0.15)';btn.style.borderColor='rgba(34,212,126,0.4)';btn.style.color='#4de89a';}
+  } else {
+    edCapPreview=false;
+    if(ov)ov.style.display='none';
+    if(btn){btn.style.background='rgba(124,92,252,0.15)';btn.style.borderColor='rgba(124,92,252,0.35)';btn.style.color='#c4b5fd';}
+  }
+}
+
+function edReset(){
+  edClip=null;edCaptions=[];edActiveCap=-1;
+  var nc=document.getElementById('ed-no-clip');if(nc)nc.style.display='flex';
+  var yw=document.getElementById('ed-yt-wrap');if(yw)yw.style.display='none';
+  var fw=document.getElementById('ed-file-wrap');if(fw)fw.style.display='none';
+  var yt=document.getElementById('ed-yt');if(yt)yt.src='';
+  var v=edVid();if(v){v.src='';v.style.filter='';}
+  document.getElementById('ed-clip-name').textContent='No clip loaded';
+  var bars=document.getElementById('ed-tl-bars');if(bars)bars.innerHTML='';
+  var ct=document.getElementById('ed-cap-track');if(ct)ct.innerHTML='';
+  var ov=document.getElementById('ed-cap-overlay');if(ov)ov.style.display='none';
+  edRenderCaps();
+  showSub('clips',document.querySelectorAll('.ntab')[1]);
+}
+
+function edExport(){
+  var sl=document.getElementById('ed-start-lbl');
+  var el=document.getElementById('ed-end-lbl');
+  var start=sl?sl.textContent:'?';
+  var end=el?el.textContent:'?';
+  var caps=edCaptions.length>0?'\n\nCaptions:\n'+edCaptions.map(function(c){return c.start+' to '+c.end+': '+c.text;}).join('\n'):'';
+  var title=edClip?edClip.clip_title:'Imported video';
+  alert('Clip ready!\n\nTitle: '+title+'\nTrim: '+start+' to '+end+caps+'\n\nTo export as MP4: open the YouTube Studio link in the Info tab and use their built-in editor to trim and download.');
+}
+
+function switchPanel(n){}
+
 
 var chatHistory=[];
 function escH(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function fmtAI(t){t=t.replace(/\*\*(.*?)\*\*/g,"<b style='color:#c4b5fd'>$1</b>");t=t.replace(/\n/g,'<br>');return t}
 async function sendMsg(){var inp=document.getElementById('ci'),text=inp.value.trim();if(!text)return;var msgs=document.getElementById('msgs');msgs.innerHTML+='<div class="mrow u"><div class="mav user">ME</div><div class="bubble user">'+escH(text)+'</div></div>';inp.value='';inp.disabled=true;document.querySelector('.sbtn').disabled=true;chatHistory.push({role:'user',content:text});var tid='t'+Date.now();msgs.innerHTML+='<div class="mrow" id="'+tid+'"><div class="mav ai">\u26A1</div><div class="bubble ai"><div class="typing"><span></span><span></span><span></span></div></div></div>';msgs.scrollTop=msgs.scrollHeight;try{var res=await fetch(BACKEND_URL+'/api/coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:chatHistory})});var data=await res.json();var reply=data&&data.reply?data.reply:'Sorry, try again!';chatHistory.push({role:'assistant',content:reply});var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai">'+fmtAI(reply)+'</div></div>'}catch(e){var el=document.getElementById(tid);if(el)el.outerHTML='<div class="mrow"><div class="mav ai">\u26A1</div><div class="bubble ai" style="color:#f87171">Connection error. Try again!</div></div>'}inp.disabled=false;document.querySelector('.sbtn').disabled=false;inp.focus();msgs.scrollTop=msgs.scrollHeight}
-
-async function loadDashStats(){
-  try{
-    var uid=currentUser?currentUser.id:null;
-    if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
-    if(!uid)return;
-    var res=await fetch(BACKEND_URL+'/api/get-clips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,filter_type:'ai'})});
-    var rd=await res.json();
-    if(!rd.success||!rd.clips)return;
-    var clips=rd.clips;
-    var total=clips.length;
-    document.getElementById('scp').textContent=total;
-    var now=Date.now();
-    var weekAgo=now-7*24*60*60*1000;
-    var weekClips=clips.filter(function(c){return c.created_at&&new Date(c.created_at).getTime()>weekAgo});
-    var thisWeek=weekClips.length;
-    var weekEl=document.getElementById('scp-week');
-    if(weekEl)weekEl.textContent=thisWeek>0?'\u2191 '+thisWeek+' this week':'No new clips this week';
-    var bestScoreEl=document.getElementById('dash-best-score');
-    var bestPercentEl=document.getElementById('dash-best-percent');
-    if(bestScoreEl){
-      if(weekClips.length>0){
-        var bestScore=Math.max.apply(null,weekClips.map(function(c){return c.viral_score||0}));
-        bestScoreEl.textContent=bestScore;
-        var percentile=Math.round((bestScore/100)*100);
-        var topPercent=100-percentile;
-        topPercent=Math.max(1,Math.min(49,topPercent));
-        if(bestPercentEl)bestPercentEl.textContent='Top '+topPercent+'% of clips';
-      } else if(clips.length>0){
-        var bestScore=Math.max.apply(null,clips.map(function(c){return c.viral_score||0}));
-        bestScoreEl.textContent=bestScore;
-        if(bestPercentEl)bestPercentEl.textContent='All time best';
-      } else {
-        bestScoreEl.textContent='-';
-        if(bestPercentEl)bestPercentEl.textContent='No clips yet';
-      }
-    }
-  }catch(e){
-    document.getElementById('scp').textContent='0';
-    var weekEl=document.getElementById('scp-week');
-    if(weekEl)weekEl.textContent='No clips yet';
-  }
-}
 
 async function generateClips(){
   var input=document.getElementById('yt-url');
@@ -1075,7 +1252,6 @@ async function generateClips(){
     }).join('');
     var badge=document.getElementById('dash-badge');if(badge){badge.style.display='';badge.textContent=data.clips.length+' Ready to Post';}
     btn.textContent='\u2705 Done!';
-    loadDashStats();
     try{
       var uid=currentUser?currentUser.id:null;
       if(!uid){var s=await sb.auth.getSession();uid=s&&s.data&&s.data.session?s.data.session.user.id:null;}
