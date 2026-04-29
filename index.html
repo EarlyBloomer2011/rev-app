@@ -422,25 +422,31 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
             </div>
           </div>
         </div>
-        <div class="pbar">
-          <div style="padding:8px 0 4px">
-            <div style="font-size:10px;color:var(--hint);margin-bottom:5px;display:flex;justify-content:space-between"><span>Trim Start</span><span>Trim End</span></div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span style="font-size:12px;color:var(--p2);font-family:monospace;min-width:36px" id="ed-trim-start-lbl">0:00</span>
-              <div style="flex:1;position:relative;height:28px;display:flex;align-items:center">
-                <div style="position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,0.08);border-radius:2px"></div>
-                <div id="ed-trim-range" style="position:absolute;height:4px;background:linear-gradient(90deg,#7c5cfc,#4f9cf9);border-radius:2px;left:0%;right:0%"></div>
-                <input type="range" id="ed-trim-start" min="0" max="100" value="0" style="position:absolute;left:0;right:0;width:100%;opacity:0;cursor:pointer;height:28px;z-index:2" oninput="edUpdateTrim()"/>
-                <input type="range" id="ed-trim-end" min="0" max="100" value="100" style="position:absolute;left:0;right:0;width:100%;opacity:0;cursor:pointer;height:28px;z-index:3" oninput="edUpdateTrim()"/>
-                <div id="ed-trim-start-handle" style="position:absolute;width:14px;height:14px;background:#7c5cfc;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(124,92,252,0.6);left:0%;transform:translateX(-50%);pointer-events:none;z-index:4"></div>
-                <div id="ed-trim-end-handle" style="position:absolute;width:14px;height:14px;background:#4f9cf9;border-radius:50%;border:2px solid white;box-shadow:0 0 8px rgba(79,156,249,0.6);left:100%;transform:translateX(-50%);pointer-events:none;z-index:4"></div>
-              </div>
-              <span style="font-size:12px;color:var(--b);font-family:monospace;min-width:36px;text-align:right" id="ed-trim-end-lbl">0:45</span>
-            </div>
-            <div style="display:flex;justify-content:center;margin-top:6px">
-              <span style="font-size:11px;color:var(--muted)" id="ed-duration-lbl">Duration: 0:45</span>
+        <div class="pbar" style="padding:0;background:rgba(7,7,26,0.95);border-top:1px solid var(--border)">
+          <div style="padding:10px 16px 6px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:var(--hint)">Timeline</span>
+            <span style="font-size:11px;color:var(--muted)" id="ed-duration-lbl">Duration: 0:45</span>
+            <div style="display:flex;gap:12px;align-items:center">
+              <span style="font-size:11px;font-family:monospace;color:var(--p2)" id="ed-trim-start-lbl">0:00</span>
+              <span style="font-size:11px;color:var(--hint)">→</span>
+              <span style="font-size:11px;font-family:monospace;color:var(--b)" id="ed-trim-end-lbl">0:45</span>
             </div>
           </div>
+          <div style="position:relative;height:72px;margin:0 16px 12px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;cursor:col-resize" id="ed-timeline">
+            <div id="ed-tl-frames" style="position:absolute;inset:0;display:flex;align-items:stretch;gap:1px;padding:2px"></div>
+            <div id="ed-tl-selected" style="position:absolute;top:0;bottom:0;background:transparent;border:2px solid #7c5cfc;border-radius:4px;pointer-events:none"></div>
+            <div id="ed-tl-left-dark" style="position:absolute;top:0;bottom:0;left:0;background:rgba(0,0,0,0.6);pointer-events:none"></div>
+            <div id="ed-tl-right-dark" style="position:absolute;top:0;bottom:0;right:0;background:rgba(0,0,0,0.6);pointer-events:none"></div>
+            <div id="ed-tl-start-handle" style="position:absolute;top:0;bottom:0;width:16px;background:#7c5cfc;cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:4px 0 0 4px;z-index:10">
+              <div style="width:2px;height:24px;background:white;border-radius:1px"></div>
+            </div>
+            <div id="ed-tl-end-handle" style="position:absolute;top:0;bottom:0;width:16px;background:#4f9cf9;cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:0 4px 4px 0;z-index:10">
+              <div style="width:2px;height:24px;background:white;border-radius:1px"></div>
+            </div>
+            <div id="ed-tl-playhead" style="position:absolute;top:0;bottom:0;width:2px;background:white;pointer-events:none;z-index:11;display:none"></div>
+          </div>
+          <input type="range" id="ed-trim-start" min="0" max="100" value="0" style="display:none" oninput="edUpdateTrim()"/>
+          <input type="range" id="ed-trim-end" min="100" max="100" value="100" style="display:none" oninput="edUpdateTrim()"/>
         </div>
       </div>
       <div class="epanel">
@@ -869,6 +875,7 @@ function edLoadClip(){
   document.getElementById('ed-studio-link').href=edClip.studio_url||'#';
   document.getElementById('ed-clip-info').innerHTML='<div><b style="color:var(--text)">Title:</b> '+edClip.clip_title+'</div><div><b style="color:var(--text)">Video:</b> '+(edClip.video_title||'Unknown')+'</div><div><b style="color:var(--text)">Timestamps:</b> '+edClip.timestamp_start+' - '+edClip.timestamp_end+'</div><div><b style="color:var(--text)">Viral Score:</b> <span style="color:#4de89a">'+edClip.viral_score+'/100</span></div>';
   edGenerateWaveform(duration);
+  setTimeout(function(){edInitTimeline(duration);},100);
   edCaptions=[];
   edRenderCaptions();
   edUpdateTrim();
@@ -878,25 +885,90 @@ function edGetVideoId(url){var m=url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11}
 function edTsToSec(ts){var p=ts.split(':');if(p.length===2)return parseInt(p[0])*60+parseInt(p[1]);if(p.length===3)return parseInt(p[0])*3600+parseInt(p[1])*60+parseInt(p[2]);return 0;}
 function edSecToTs(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
 
-function edUpdateTrim(){
-  if(!edClip)return;
-  var startSec=edTsToSec(edClip.timestamp_start||'0:00');
-  var endSec=edTsToSec(edClip.timestamp_end||'0:45');
-  var duration=endSec-startSec;
-  var s=parseFloat(document.getElementById('ed-trim-start').value);
-  var e=parseFloat(document.getElementById('ed-trim-end').value);
-  if(s>=e-2)s=e-2;
-  document.getElementById('ed-trim-start').value=s;
-  document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec+s);
-  document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(startSec+e);
-  document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(e-s);
-  var sp=duration>0?s/duration*100:0;
-  var ep=duration>0?e/duration*100:100;
-  document.getElementById('ed-trim-range').style.left=sp+'%';
-  document.getElementById('ed-trim-range').style.right=(100-ep)+'%';
-  document.getElementById('ed-trim-start-handle').style.left=sp+'%';
-  document.getElementById('ed-trim-end-handle').style.left=ep+'%';
+function edInitTimeline(duration){
+  var tl=document.getElementById('ed-timeline');
+  var startH=document.getElementById('ed-tl-start-handle');
+  var endH=document.getElementById('ed-tl-end-handle');
+  var tlW=tl.offsetWidth;
+  var trimStart=0;
+  var trimEnd=duration;
+
+  function pct(sec){return Math.max(0,Math.min(100,sec/duration*100));}
+  function secFromX(x){return Math.max(0,Math.min(duration,x/tlW*duration));}
+
+  function renderFrames(){
+    var frames=document.getElementById('ed-tl-frames');
+    var count=Math.round(tlW/8);
+    var html='';
+    for(var i=0;i<count;i++){
+      var h=30+Math.random()*40;
+      var bright=0.3+Math.random()*0.5;
+      html+='<div style="flex:1;height:'+h+'%;align-self:center;background:rgba(124,92,252,'+bright+');border-radius:1px;min-width:3px"></div>';
+    }
+    frames.innerHTML=html;
+  }
+
+  function update(){
+    var sp=pct(trimStart);
+    var ep=pct(trimEnd);
+    startH.style.left=sp+'%';
+    endH.style.left='calc('+ep+'% - 16px)';
+    document.getElementById('ed-tl-left-dark').style.width=sp+'%';
+    document.getElementById('ed-tl-right-dark').style.width=(100-ep)+'%';
+    document.getElementById('ed-tl-selected').style.left=sp+'%';
+    document.getElementById('ed-tl-selected').style.right=(100-ep)+'%';
+    var startSec=edTsToSec(edClip.timestamp_start||'0:00');
+    document.getElementById('ed-trim-start-lbl').textContent=edSecToTs(startSec+trimStart);
+    document.getElementById('ed-trim-end-lbl').textContent=edSecToTs(startSec+trimEnd);
+    document.getElementById('ed-duration-lbl').textContent='Duration: '+edSecToTs(trimEnd-trimStart);
+    document.getElementById('ed-trim-start').value=trimStart;
+    document.getElementById('ed-trim-end').value=trimEnd;
+  }
+
+  renderFrames();
+  update();
+
+  function makeDraggable(handle,isStart){
+    handle.addEventListener('mousedown',function(e){
+      e.preventDefault();
+      var rect=tl.getBoundingClientRect();
+      function onMove(e){
+        var x=e.clientX-rect.left;
+        var sec=secFromX(x);
+        if(isStart){trimStart=Math.min(sec,trimEnd-2);}
+        else{trimEnd=Math.max(sec,trimStart+2);}
+        update();
+      }
+      function onUp(){
+        document.removeEventListener('mousemove',onMove);
+        document.removeEventListener('mouseup',onUp);
+      }
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('mouseup',onUp);
+    });
+    handle.addEventListener('touchstart',function(e){
+      var rect=tl.getBoundingClientRect();
+      function onMove(e){
+        var x=e.touches[0].clientX-rect.left;
+        var sec=secFromX(x);
+        if(isStart){trimStart=Math.min(sec,trimEnd-2);}
+        else{trimEnd=Math.max(sec,trimStart+2);}
+        update();
+      }
+      function onUp(){
+        document.removeEventListener('touchmove',onMove);
+        document.removeEventListener('touchend',onUp);
+      }
+      document.addEventListener('touchmove',onMove,{passive:true});
+      document.addEventListener('touchend',onUp);
+    },{passive:true});
+  }
+
+  makeDraggable(startH,true);
+  makeDraggable(endH,false);
 }
+
+function edUpdateTrim(){}
 
 function edGenerateWaveform(duration){
   var bars=document.getElementById('ed-waveform-bars');
