@@ -403,8 +403,12 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text)" id="ed-clip-name">No clip loaded</div>
       </div>
       <div style="display:flex;gap:8px">
+        <label style="background:rgba(255,255,255,0.08);border:1px solid var(--border2);color:var(--text);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px">
+          &#128249; Import Video
+          <input type="file" accept="video/*" style="display:none" onchange="edImportFile(this)"/>
+        </label>
         <button onclick="edTogglePreview()" id="ed-preview-btn" style="background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.35);color:#c4b5fd;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">&#128065; Preview</button>
-        <button onclick="edExport()" style="background:linear-gradient(135deg,#22d47e,#16a34a);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">&#11015; Export</button>
+        <button id="ed-export-btn" onclick="edExport()" style="background:linear-gradient(135deg,#22d47e,#16a34a);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">&#11015; Export</button>
       </div>
     </div>
     <div style="flex:1;display:flex;overflow:hidden">
@@ -930,6 +934,7 @@ function edLoadClip(){
 
 function edImportFile(input){
   if(!input.files||!input.files[0])return;
+  window._edImportedFile=input.files[0];
   var url=URL.createObjectURL(input.files[0]);
   document.getElementById('ed-no-clip').style.display='none';
   document.getElementById('ed-yt-wrap').style.display='none';
@@ -938,12 +943,15 @@ function edImportFile(input){
   document.getElementById('ed-clip-name').textContent=input.files[0].name.replace(/\.[^.]+$/,'');
   v.onloadedmetadata=function(){
     var dur=v.duration||30;
+    window._edDuration=dur;
+    window._edTrimStart=0;
+    window._edTrimEnd=dur;
+    window._edStartSec=0;
     document.getElementById('ed-start-lbl').textContent=edSec(0);
     document.getElementById('ed-end-lbl').textContent=edSec(dur);
     document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(dur);
     edCaptions=[];edActiveCap=-1;edRenderCaps();
     setTimeout(function(){edInitTL(dur,0);edInitStickers();edInitFilters();},100);
-    v.ontimeupdate=function(){edPlayhead(v.currentTime,dur);};
   };
 }
 
@@ -953,6 +961,10 @@ function edInitTL(duration,startSec){
   var sh=document.getElementById('ed-tl-sh');
   var eh=document.getElementById('ed-tl-eh');
   var trimS=0,trimE=duration;
+  window._edTrimStart=0;
+  window._edTrimEnd=duration;
+  window._edDuration=duration;
+  window._edStartSec=startSec||0;
 
   var bars=document.getElementById('ed-tl-bars');
   if(bars){
@@ -963,6 +975,7 @@ function edInitTL(duration,startSec){
 
   function pct(s){return Math.max(0,Math.min(100,s/duration*100));}
   function fromX(x){return Math.max(0,Math.min(duration,x/tlW*duration));}
+
   function update(){
     var sp=pct(trimS),ep=pct(trimE);
     sh.style.left=sp+'%';
@@ -974,8 +987,14 @@ function edInitTL(duration,startSec){
     document.getElementById('ed-start-lbl').textContent=edSec(startSec+trimS);
     document.getElementById('ed-end-lbl').textContent=edSec(startSec+trimE);
     document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(trimE-trimS);
+    window._edTrimStart=trimS;
+    window._edTrimEnd=trimE;
     edRenderCapTrack(duration);
+    // Seek video to trim start when handle moves
+    var vid=edVid();
+    if(vid&&vid.src)vid.currentTime=trimS;
   }
+
   function drag(handle,isStart){
     function go(cx){
       var rect=tl.getBoundingClientRect();
@@ -997,6 +1016,19 @@ function edInitTL(duration,startSec){
     },{passive:true});
   }
   drag(sh,true);drag(eh,false);update();
+
+  // Set up video to respect trim points during playback
+  var vid=edVid();
+  if(vid&&vid.src){
+    vid.ontimeupdate=function(){
+      var ts=window._edTrimStart||0;
+      var te=window._edTrimEnd||duration;
+      if(vid.currentTime>=te){vid.pause();vid.currentTime=ts;}
+      edPlayhead(vid.currentTime,duration);
+    };
+    // Start at trim start
+    vid.currentTime=trimS;
+  }
 }
 
 function edPlayhead(t,dur){
@@ -1222,44 +1254,59 @@ function edReset(){
 }
 
 async function edExport(){
-  if(!edClip&&!edVid().src){alert('No clip loaded!');return;}
-  var sl=document.getElementById('ed-start-lbl');
-  var el=document.getElementById('ed-end-lbl');
-  var trimStartSec=edTs(sl?sl.textContent:'0:00');
-  var trimEndSec=edTs(el?el.textContent:'0:45');
-  var btn=document.querySelector('#sp-editor button:last-child');
-  if(btn){btn.textContent='\u23F3 Exporting...';btn.style.opacity='0.7';btn.disabled=true;}
+  var hasYt=document.getElementById('ed-yt-wrap').style.display!=='none'&&edClip;
+  var hasFile=document.getElementById('ed-file-wrap').style.display!=='none'&&window._edImportedFile;
+  if(!hasYt&&!hasFile){alert('No clip loaded! Import a video first.');return;}
+
+  var trimS=window._edTrimStart||0;
+  var trimE=window._edTrimEnd||window._edDuration||45;
+  var title=edClip?edClip.clip_title:(window._edImportedFile?window._edImportedFile.name.replace(/\.[^.]+$/,''):'clip');
+
+  var exportBtn=document.getElementById('ed-export-btn');
+  if(exportBtn){exportBtn.textContent='\u23F3 Exporting...';exportBtn.style.opacity='0.7';exportBtn.disabled=true;}
+
   try{
     var caps=edCaptions.map(function(c){
       return {text:c.text,start_sec:edTs(c.start),end_sec:edTs(c.end),font:c.font,color:c.color,size:c.size,pos:c.pos,bg:c.bg};
     });
-    var payload={
-      youtube_url:edClip?edClip.youtube_url:'',
-      trim_start:trimStartSec,
-      trim_end:trimEndSec,
-      captions:caps,
-      clip_title:edClip?edClip.clip_title:'clip'
-    };
-    var res=await fetch(BACKEND_URL+'/api/process-clip',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
+
+    var formData=new FormData();
+    formData.append('trim_start',trimS);
+    formData.append('trim_end',trimE);
+    formData.append('captions',JSON.stringify(caps));
+    formData.append('clip_title',title);
+
+    var res;
+    if(hasFile){
+      // Upload file directly
+      formData.append('video_file',window._edImportedFile);
+      res=await fetch(BACKEND_URL+'/api/process-file',{method:'POST',body:formData});
+    } else {
+      // YouTube URL
+      formData.append('youtube_url',edClip.youtube_url);
+      res=await fetch(BACKEND_URL+'/api/process-clip',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({youtube_url:edClip.youtube_url,trim_start:trimS,trim_end:trimE,captions:caps,clip_title:title})
+      });
+    }
+
     if(!res.ok){
-      var err=await res.json();
+      var err=await res.json().catch(function(){return {error:'Export failed'};});
       throw new Error(err.error||'Export failed');
     }
+
     var blob=await res.blob();
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
     a.href=url;
-    a.download=(edClip?edClip.clip_title:'clip').replace(/[^a-zA-Z0-9]/g,'_')+'.mp4';
+    a.download=title.replace(/[^a-zA-Z0-9]/g,'_')+'.mp4';
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    if(btn){btn.textContent='\u2705 Downloaded!';setTimeout(function(){btn.textContent='\u11015 Export';btn.style.opacity='1';btn.disabled=false;},3000);}
+    if(exportBtn){exportBtn.textContent='\u2705 Downloaded!';setTimeout(function(){exportBtn.textContent='\u11015 Export';exportBtn.style.opacity='1';exportBtn.disabled=false;},3000);}
   }catch(e){
     alert('Export failed: '+e.message);
-    if(btn){btn.textContent='\u11015 Export';btn.style.opacity='1';btn.disabled=false;}
+    if(exportBtn){exportBtn.textContent='\u11015 Export';exportBtn.style.opacity='1';exportBtn.disabled=false;}
   }
 }
 
