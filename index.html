@@ -407,6 +407,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
           &#128249; Import Video
           <input type="file" accept="video/*" style="display:none" onchange="edImportFile(this)"/>
         </label>
+        <button onclick="edToggleRazor()" id="ed-razor-btn" title="Razor tool - click on timeline to cut" style="background:rgba(255,255,255,0.08);border:1px solid var(--border2);color:var(--text);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">&#9988; Razor</button>
         <button onclick="edTogglePreview()" id="ed-preview-btn" style="background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.35);color:#c4b5fd;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">&#128065; Preview</button>
         <button id="ed-export-btn" onclick="edExport()" style="background:linear-gradient(135deg,#22d47e,#16a34a);border:none;color:white;padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">&#11015; Export</button>
       </div>
@@ -473,7 +474,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
               <div id="ed-tl-sh" style="position:absolute;top:0;bottom:0;left:0;width:16px;background:linear-gradient(180deg,#7c5cfc,#5a3fc0);cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:7px 0 0 7px;z-index:10;user-select:none">
                 <div style="display:flex;gap:2px"><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div></div>
               </div>
-              <div id="ed-tl-eh" style="position:absolute;top:0;bottom:0;right:0;width:16px;background:linear-gradient(180deg,#4f9cf9,#2563eb);cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:0 7px 7px 0;z-index:10;user-select:none">
+              <div id="ed-tl-eh" style="position:absolute;top:0;bottom:0;left:calc(100% - 16px);width:16px;background:linear-gradient(180deg,#4f9cf9,#2563eb);cursor:ew-resize;display:flex;align-items:center;justify-content:center;border-radius:0 7px 7px 0;z-index:10;user-select:none">
                 <div style="display:flex;gap:2px"><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div><div style="width:2px;height:18px;background:rgba(255,255,255,0.9);border-radius:1px"></div></div>
               </div>
             </div>
@@ -943,13 +944,14 @@ function edImportFile(input){
   document.getElementById('ed-clip-name').textContent=input.files[0].name.replace(/\.[^.]+$/,'');
   v.onloadedmetadata=function(){
     var dur=v.duration||30;
+    var defaultEnd=Math.min(dur,60); // Default to first 60 seconds
     window._edDuration=dur;
     window._edTrimStart=0;
-    window._edTrimEnd=dur;
+    window._edTrimEnd=defaultEnd;
     window._edStartSec=0;
     document.getElementById('ed-start-lbl').textContent=edSec(0);
-    document.getElementById('ed-end-lbl').textContent=edSec(dur);
-    document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(dur);
+    document.getElementById('ed-end-lbl').textContent=edSec(defaultEnd);
+    document.getElementById('ed-dur-lbl').textContent='Duration: '+edSec(defaultEnd);
     edCaptions=[];edActiveCap=-1;edRenderCaps();
     setTimeout(function(){edInitTL(dur,0);edInitStickers();edInitFilters();},100);
   };
@@ -960,9 +962,8 @@ function edInitTL(duration,startSec){
   var tlW=tl.offsetWidth||500;
   var sh=document.getElementById('ed-tl-sh');
   var eh=document.getElementById('ed-tl-eh');
-  var trimS=0,trimE=duration;
-  window._edTrimStart=0;
-  window._edTrimEnd=duration;
+  var trimS=window._edTrimStart||0;
+  var trimE=window._edTrimEnd||Math.min(duration,60);
   window._edDuration=duration;
   window._edStartSec=startSec||0;
 
@@ -979,7 +980,7 @@ function edInitTL(duration,startSec){
   function update(){
     var sp=pct(trimS),ep=pct(trimE);
     sh.style.left=sp+'%';
-    eh.style.right=(100-ep)+'%';
+    eh.style.left='calc('+ep+'% - 16px)';eh.style.right='auto';
     document.getElementById('ed-tl-ldark').style.width=sp+'%';
     document.getElementById('ed-tl-rdark').style.width=(100-ep)+'%';
     var b=document.getElementById('ed-tl-border');
@@ -1017,7 +1018,31 @@ function edInitTL(duration,startSec){
   }
   drag(sh,true);drag(eh,false);update();
 
-  // Set up video to respect trim points during playback
+  // Click on timeline to set razor cut point or seek
+  tl.addEventListener('click',function(e){
+    if(e.target===sh||e.target===eh||sh.contains(e.target)||eh.contains(e.target))return;
+    var rect=tl.getBoundingClientRect();
+    var sec=fromX(e.clientX-rect.left);
+    if(window._edRazorActive){
+      // Razor mode: cut at this point (set trim end to cut point)
+      trimE=Math.max(trimS+1,Math.min(duration,sec));
+      update();
+      // Flash the cut line
+      var flash=document.createElement('div');
+      flash.style.cssText='position:absolute;top:0;bottom:0;left:'+pct(sec)+'%;width:2px;background:#f87171;pointer-events:none;z-index:20';
+      tl.appendChild(flash);
+      setTimeout(function(){if(flash.parentNode)flash.remove();},500);
+    } else {
+      // Normal mode: seek video to clicked position
+      var vid=edVid();
+      if(vid&&vid.src){
+        var clampedSec=Math.max(trimS,Math.min(trimE,sec));
+        vid.currentTime=clampedSec;
+      }
+    }
+  });
+
+  // Set up video trim enforcement
   var vid=edVid();
   if(vid&&vid.src){
     vid.ontimeupdate=function(){
@@ -1026,8 +1051,23 @@ function edInitTL(duration,startSec){
       if(vid.currentTime>=te){vid.pause();vid.currentTime=ts;}
       edPlayhead(vid.currentTime,duration);
     };
-    // Start at trim start
     vid.currentTime=trimS;
+  }
+}
+
+var _razorActive=false;
+function edToggleRazor(){
+  _razorActive=!_razorActive;
+  window._edRazorActive=_razorActive;
+  var btn=document.getElementById('ed-razor-btn');
+  var tl=document.getElementById('ed-timeline');
+  if(_razorActive){
+    if(btn){btn.style.background='rgba(248,113,113,0.2)';btn.style.borderColor='rgba(248,113,113,0.5)';btn.style.color='#f87171';}
+    if(tl)tl.style.cursor='crosshair';
+    showSettingsSaved('Razor active — click timeline to cut');
+  } else {
+    if(btn){btn.style.background='rgba(255,255,255,0.08)';btn.style.borderColor='var(--border2)';btn.style.color='var(--text)';}
+    if(tl)tl.style.cursor='col-resize';
   }
 }
 
