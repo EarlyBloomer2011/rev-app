@@ -542,7 +542,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
           </div>
           <div class="ed-file-wrap" id="ed-file-wrap">
             <video id="ed-video" style="width:100%;height:100%;object-fit:contain" playsinline></video>
-            <div class="ed-cap-overlay" id="ed-file-cap-overlay" style="bottom:60px">
+            <div class="ed-cap-overlay" id="ed-file-cap-overlay" style="display:none;bottom:60px">
               <span class="ed-cap-text" id="ed-file-cap-text" style="display:none"></span>
             </div>
           </div>
@@ -1303,12 +1303,13 @@ function edRenderVideoTrack(){
       // Drag segment
       var startX=e.clientX;
       var origStart=seg.start;
+      var origEnd=seg.end;
       var mm=function(e2){
         var dx=e2.clientX-startX;
         var dt=dx/edZoom;
+        var dur=origEnd-origStart;
         seg.start=Math.max(0,origStart+dt);
-        seg.end=seg.start+(origStart+(seg.end-origStart)-origStart);
-        seg.end=Math.min(edDuration,Math.max(seg.start+0.1,seg.end));
+        seg.end=Math.min(edDuration,seg.start+dur);
         edRenderVideoTrack();
       };
       var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
@@ -1598,11 +1599,13 @@ function edUpdateCapOverlay(){
   var ct2=document.getElementById('ed-file-cap-text');
   if(activeCap){
     if(ov1)ov1.style.display='block';
+    if(ov2)ov2.style.display='block';
     if(ct1){ct1.textContent=activeCap.text;edStyleCapEl(ct1,activeCap);}
     if(ct2){ct2.style.display='inline-block';ct2.textContent=activeCap.text;edStyleCapEl(ct2,activeCap);}
     edPosCaption(activeCap.pos);
   }else{
     if(ov1)ov1.style.display='none';
+    if(ov2)ov2.style.display='none';
     if(ct2)ct2.style.display='none';
   }
 }
@@ -1738,7 +1741,7 @@ function edRenderCaps(){
       +'<input class="ed-cap-ts end" type="text" value="'+edSec(cap.end)+'" onchange="edCapTimestamp('+i+',\'end\',this.value)" onclick="event.stopPropagation()"/>'
       +'<button class="ed-cap-del" onclick="edDelCap('+i+');event.stopPropagation()">✕</button>'
       +'</div>'
-      +'<textarea class="ed-cap-textarea" rows="2" onchange="edCaptions['+i+'].text=this.value;edRenderCaptionTrack()" onclick="event.stopPropagation()">'+cap.text+'</textarea>'
+      +'<textarea class="ed-cap-textarea" rows="2" oninput="edCaptions['+i+'].text=this.value;edRenderCaptionTrack();if(edActiveCap==='+i+')edApplyCap(edCaptions['+i+'])" onclick="event.stopPropagation()">'+cap.text+'</textarea>'
       +'</div>';
   }).join('');
 }
@@ -1758,6 +1761,7 @@ function edSelCap(i){
   var cap=edCaptions[i];if(!cap)return;
   edApplyCap(cap);
   var ov=document.getElementById('ed-cap-overlay');if(ov)ov.style.display='block';
+  var ov2=document.getElementById('ed-file-cap-overlay');if(ov2)ov2.style.display='block';
   edPosCaption(cap.pos);
 }
 
@@ -1767,6 +1771,7 @@ function edDelCap(i){
   edRenderCaps();
   edRenderCaptionTrack();
   var ov=document.getElementById('ed-cap-overlay');if(ov)ov.style.display='none';
+  var ov2=document.getElementById('ed-file-cap-overlay');if(ov2)ov2.style.display='none';
   var ct2=document.getElementById('ed-file-cap-text');if(ct2)ct2.style.display='none';
 }
 
@@ -1901,10 +1906,12 @@ function edTool(name){
 /* --- preview toggle --- */
 function edTogglePreview(){
   var ov=document.getElementById('ed-cap-overlay');
+  var ov2=document.getElementById('ed-file-cap-overlay');
   var btn=document.getElementById('ed-preview-btn');
   var showing=ov&&ov.style.display==='block';
   if(showing){
     if(ov)ov.style.display='none';
+    if(ov2)ov2.style.display='none';
     if(btn){btn.classList.remove('green');}
   }else{
     if(edActiveCap>=0&&edCaptions[edActiveCap]){
