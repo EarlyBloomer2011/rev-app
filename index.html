@@ -677,7 +677,13 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         <div id="profile-name-display" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">User</div>
         <div id="profile-email-display" style="font-size:12px;color:var(--muted);margin-top:4px">your@email.com</div>
       </div>
-      <div class="av-se<script>
+      <div class="av-section"><div class="av-section-title">Upload your own photo</div><input type="file" id="profile-pfp-input" accept="image/*" style="display:none" onchange="profileUploadPFP(this)"/><button class="sbtn-sm primary" style="width:100%" onclick="document.getElementById('profile-pfp-input').click()">&#128247; Upload Photo</button></div>
+      <div class="av-section"><div class="av-section-title">Plain colours</div><div class="avatar-grid" id="plain-avatars"></div></div>
+      <div class="av-section"><div class="av-section-title">Cool gradients</div><div class="avatar-grid" id="gradient-avatars"></div></div>
+    </div>
+  </div>
+</div>
+<script>
 var BACKEND_URL='https://rev-backend-9ubw.onrender.com';
 var sb;
 var currentUser=null;
@@ -870,9 +876,4 @@ function edReset(){if(edPlaying)edPlayPause();edClip=null;edVideoSegs=[];edCapti
 async function edExport(){var hasYt=document.getElementById('ed-yt-wrap').style.display!=='none'&&edClip,hasFile=document.getElementById('ed-file-wrap').style.display!=='none'&&window._edImportedFile;if(!hasYt&&!hasFile){alert('No clip loaded! Import a video first.');return;}var trimS=edDuration,trimE=0;if(edVideoSegs.length>0){edVideoSegs.forEach(function(seg){trimS=Math.min(trimS,seg.start);trimE=Math.max(trimE,seg.end);});}else{trimS=0;trimE=edDuration;}var title=edClip?edClip.clip_title:(window._edImportedFile?window._edImportedFile.name.replace(/\.[^.]+$/,''):'clip');var startOffset=edClip?edTs(edClip.timestamp_start||'0:00'):0;var exportBtn=document.getElementById('ed-export-btn');if(exportBtn){exportBtn.textContent='⏳ Exporting...';exportBtn.style.opacity='0.7';exportBtn.disabled=true;}try{var caps=edCaptions.map(function(c){return {text:c.text,start_sec:c.start+startOffset,end_sec:c.end+startOffset,font:c.font,color:c.color,size:c.size,pos:c.pos,bg:c.bg};});var res;if(hasFile){var formData=new FormData();formData.append('trim_start',trimS);formData.append('trim_end',trimE);formData.append('captions',JSON.stringify(caps));formData.append('clip_title',title);formData.append('video_file',window._edImportedFile);res=await fetch(BACKEND_URL+'/api/process-file',{method:'POST',body:formData});}else{res=await fetch(BACKEND_URL+'/api/process-clip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({youtube_url:edClip.youtube_url,trim_start:trimS+startOffset,trim_end:trimE+startOffset,captions:caps,clip_title:title})});}if(!res.ok){var err=await res.json().catch(function(){return {error:'Export failed'};});throw new Error(err.error||'Export failed');}var blob=await res.blob();var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=title.replace(/[^a-zA-Z0-9]/g,'_')+'.mp4';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);if(exportBtn){exportBtn.textContent='✅ Downloaded!';setTimeout(function(){exportBtn.textContent='⬇ Export';exportBtn.style.opacity='1';exportBtn.disabled=false;},3000);}}catch(e){alert('Export failed: '+e.message);if(exportBtn){exportBtn.textContent='⬇ Export';exportBtn.style.opacity='1';exportBtn.disabled=false;}}}
 </script>
 </body>
-</html>ction"><div class="av-section-title">Upload your own photo</div><input type="file" id="profile-pfp-input" accept="image/*" style="display:none" onchange="profileUploadPFP(this)"/><button class="sbtn-sm primary" style="width:100%" onclick="document.getElementById('profile-pfp-input').click()">&#128247; Upload Photo</button></div>
-      <div class="av-section"><div class="av-section-title">Plain colours</div><div class="avatar-grid" id="plain-avatars"></div></div>
-      <div class="av-section"><div class="av-section-title">Cool gradients</div><div class="avatar-grid" id="gradient-avatars"></div></div>
-    </div>
-  </div>
-</div>
+</html>
