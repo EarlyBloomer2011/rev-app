@@ -333,7 +333,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 <canvas id="canvas"></canvas>
 
 <!-- LOGIN PAGE -->
-  <div class="page active" id="pg-login">
+   <div class="page active" id="pg-login">
   <div style="position:relative;z-index:20;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
     <div class="lcard" id="lcard-login">
       <span class="rev-logo">REV</span>
@@ -577,6 +577,15 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
                 <div class="ed-track-canvas" id="ed-track-captions"></div>
               </div>
 
+              <!-- Sticker track -->
+              <div class="ed-track-row" id="ed-sticker-track-row">
+                <div class="ed-track-label">
+                  <div class="tl-icon">✨</div>
+                  <div class="tl-lbl">Sticker</div>
+                </div>
+                <div class="ed-track-canvas" id="ed-track-stickers"></div>
+              </div>
+
               <!-- SFX track -->
               <div class="ed-track-row" id="ed-audio-track-row">
                 <div class="ed-track-label">
@@ -589,8 +598,8 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
               <!-- Effects track -->
               <div class="ed-track-row">
                 <div class="ed-track-label">
-                  <div class="tl-icon">&#127771;</div>
-                  <div class="tl-lbl">FX</div>
+                  <div class="tl-icon">&#127912;</div>
+                  <div class="tl-lbl">Filter</div>
                 </div>
                 <div class="ed-track-canvas" id="ed-track-effects"></div>
               </div>
@@ -1275,6 +1284,7 @@ var edClip=null;
 var edVideoSegs=[];
 var edCaptions=[];
 var edAudioSegs=[];
+var edStickerSegs=[];
 var edEffectSegs=[];
 var edDuration=60;
 var edZoom=20;         // px per second
@@ -1356,6 +1366,7 @@ function edRenderAllTracks(){
   edRenderRuler();
   edRenderVideoTrack();
   edRenderCaptionTrack();
+  edRenderStickerTrack();
   edRenderAudioTrack();
   edRenderEffectTrack();
   edUpdatePlayhead();
@@ -1679,6 +1690,55 @@ function edRenderAudioTrack(){
   });
 }
 
+/* --- render sticker track --- */
+function edRenderStickerTrack(){
+  var tc=document.getElementById('ed-track-stickers');
+  if(!tc)return;
+  tc.innerHTML='';
+  var w=edTrackW()-60;
+  tc.style.cssText='position:relative;width:'+w+'px;min-width:'+w+'px;height:100%;overflow:visible';
+  edStickerSegs.forEach(function(seg,i){
+    var left=edTimeToPx(seg.start)-60;
+    var width=Math.max(8,(seg.end-seg.start)*edZoom);
+    var el=document.createElement('div');
+    el.className='ed-segment';
+    el.style.cssText='left:'+left+'px;width:'+width+'px;background:linear-gradient(180deg,rgba(251,191,36,0.6),rgba(180,130,0,0.45));border:1px solid rgba(251,191,36,0.4)';
+    el.innerHTML='<div class="seg-handle left"><div class="seg-handle-bar"></div></div>'
+      +'<div class="seg-label">'+seg.emoji+' '+seg.label+'</div>'
+      +'<div class="seg-del">✕</div>'
+      +'<div class="seg-handle right"><div class="seg-handle-bar"></div></div>';
+    el.querySelector('.seg-del').addEventListener('click',function(e){
+      e.stopPropagation();
+      edStickerSegs.splice(i,1);
+      edRenderStickerTrack();
+      // remove from preview
+      var el2=document.getElementById('sticker-'+seg.id);
+      if(el2)el2.remove();
+    });
+    el.addEventListener('mousedown',function(e){
+      if(e.target.classList.contains('seg-handle')||e.target.classList.contains('seg-handle-bar')||e.target.classList.contains('seg-del'))return;
+      e.stopPropagation();
+      var startX=e.clientX,origStart=seg.start,dur=seg.end-seg.start;
+      var mm=function(e2){seg.start=Math.max(0,origStart+(e2.clientX-startX)/edZoom);seg.end=seg.start+dur;edRenderStickerTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    el.querySelector('.seg-handle.left').addEventListener('mousedown',function(e){
+      e.stopPropagation();var startX=e.clientX,origStart=seg.start;
+      var mm=function(e2){seg.start=Math.max(0,Math.min(seg.end-0.1,origStart+(e2.clientX-startX)/edZoom));edRenderStickerTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    el.querySelector('.seg-handle.right').addEventListener('mousedown',function(e){
+      e.stopPropagation();var startX=e.clientX,origEnd=seg.end;
+      var mm=function(e2){seg.end=Math.max(seg.start+0.1,origEnd+(e2.clientX-startX)/edZoom);edRenderStickerTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    tc.appendChild(el);
+  });
+}
+
 /* --- render effects track --- */
 function edRenderEffectTrack(){
   var tc=document.getElementById('ed-track-effects');
@@ -1870,6 +1930,11 @@ function edUpdateCapOverlay(){
       layer.style.pointerEvents='none';
     }
   }
+  // Show/hide stickers based on time
+  edStickerSegs.forEach(function(seg){
+    var el=document.getElementById('sticker-'+seg.id);
+    if(el)el.style.display=(t>=seg.start&&t<=seg.end)?'block':'none';
+  });
 }
 
 /* --- open clip from My Clips --- */
@@ -1908,7 +1973,7 @@ function edLoadClip(){
 
   // Build initial video segment spanning full clip
   edVideoSegs=[{id:edUid(),start:0,end:edDuration,label:edClip.clip_title||'Clip'}];
-  edCaptions=[];edAudioSegs=[];edEffectSegs=[];
+  edCaptions=[];edAudioSegs=[];edStickerSegs=[];edEffectSegs=[];
   edActiveCap=-1;edSelectedSeg=null;
   edRenderCaps();
   setTimeout(function(){
@@ -1937,7 +2002,7 @@ function edImportFile(input){
     window._edStartSec=0;
     document.getElementById('ed-tl-durinfo').textContent='Duration: '+edSecShort(edDuration);
     edVideoSegs=[{id:edUid(),start:0,end:edDuration,label:input.files[0].name.replace(/\.[^.]+$/,'')}];
-    edCaptions=[];edAudioSegs=[];edEffectSegs=[];
+    edCaptions=[];edAudioSegs=[];edStickerSegs=[];edEffectSegs=[];
     edActiveCap=-1;edSelectedSeg=null;
     edRenderCaps();
     setTimeout(function(){
@@ -2245,27 +2310,44 @@ function edInitStickers(){
 }
 function edPlaceSticker(i){
   var emoji=edStickers[i]||'✨';
-  var wrap=document.getElementById('ed-yt-wrap');
-  if(document.getElementById('ed-file-wrap').style.display!=='none')wrap=document.getElementById('ed-file-wrap');
-  if(!wrap)return;
+  var segId=edUid();
+  var seg={id:segId,emoji:emoji,label:emoji,start:edCurrentTime,end:Math.min(edDuration,edCurrentTime+5),x:35,y:30};
+  edStickerSegs.push(seg);
+  edRenderStickerTrack();
+  edAddStickerToPreview(seg);
+  showToast(emoji+' added — drag on preview to position!');
+}
+function edAddStickerToPreview(seg){
+  var preview=document.getElementById('ed-preview');
+  if(!preview)return;
+  // Remove old instance if exists
+  var old=document.getElementById('sticker-'+seg.id);
+  if(old)old.remove();
   var s=document.createElement('div');
-  s.textContent=emoji;
-  s.style.cssText='position:absolute;font-size:44px;cursor:move;user-select:none;top:30%;left:35%;z-index:20;line-height:1;';
-  s.title='Drag me! Double-click to remove.';
-  s.addEventListener('dblclick',function(){s.remove();});
+  s.id='sticker-'+seg.id;
+  s.textContent=seg.emoji;
+  s.style.cssText='position:absolute;font-size:44px;cursor:move;user-select:none;top:'+seg.y+'%;left:'+seg.x+'%;z-index:20;line-height:1;display:block';
+  s.addEventListener('dblclick',function(){
+    edStickerSegs=edStickerSegs.filter(function(ss){return ss.id!==seg.id;});
+    edRenderStickerTrack();
+    s.remove();
+  });
   s.addEventListener('mousedown',function(e){
     e.preventDefault();
-    var wRect=wrap.getBoundingClientRect();
-    var ox=e.clientX-wRect.left-parseFloat(s.style.left||'35'),oy=e.clientY-wRect.top-parseFloat(s.style.top||'30');
+    var pRect=preview.getBoundingClientRect();
+    var ox=e.clientX-pRect.left-parseFloat(s.style.left||'35%')*pRect.width/100;
+    var oy=e.clientY-pRect.top-parseFloat(s.style.top||'30%')*pRect.height/100;
     var mm=function(ev){
-      var r=wrap.getBoundingClientRect();
-      s.style.left=Math.max(0,Math.min(r.width-40,ev.clientX-r.left-ox))+'px';
-      s.style.top=Math.max(0,Math.min(r.height-40,ev.clientY-r.top-oy))+'px';
+      var r=preview.getBoundingClientRect();
+      var nx=Math.max(0,Math.min(r.width-40,ev.clientX-r.left-ox));
+      var ny=Math.max(0,Math.min(r.height-40,ev.clientY-r.top-oy));
+      s.style.left=nx+'px';s.style.top=ny+'px';
+      seg.x=nx/r.width*100;seg.y=ny/r.height*100;
     };
     var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
     document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
   });
-  wrap.appendChild(s);
+  preview.appendChild(s);
 }
 
 /* --- tool switcher --- */
@@ -2350,7 +2432,7 @@ function edTogglePreview(){
 /* --- back / reset --- */
 function edReset(){
   if(edPlaying){edPlayPause();}
-  edClip=null;edVideoSegs=[];edCaptions=[];edAudioSegs=[];edEffectSegs=[];
+  edClip=null;edVideoSegs=[];edCaptions=[];edAudioSegs=[];edStickerSegs=[];edEffectSegs=[];
   edActiveCap=-1;edSelectedSeg=null;edCurrentTime=0;edDuration=60;
   var nc=document.getElementById('ed-no-clip');if(nc)nc.style.display='flex';
   var yw=document.getElementById('ed-yt-wrap');if(yw)yw.style.display='none';
