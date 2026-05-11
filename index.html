@@ -171,7 +171,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 .ed-ruler-tick .tick-lbl{font-family:monospace;font-size:9px;color:var(--hint);margin-bottom:1px;white-space:nowrap}
 .ed-track-row{display:flex;height:44px;border-bottom:1px solid rgba(255,255,255,0.04);position:relative;flex-shrink:0}
 .ed-track-row:last-child{border-bottom:none}
-.ed-track-label{width:60px;min-width:60px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;border-right:1px solid rgba(255,255,255,0.06);background:rgba(5,5,20,0.98);position:sticky;left:0;z-index:5;flex-shrink:0}
+.ed-track-label{width:60px;min-width:60px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;border-right:1px solid rgba(255,255,255,0.06);background:rgba(5,5,20,1);position:sticky;left:0;z-index:6;flex-shrink:0}
 .ed-track-label .tl-icon{font-size:13px}
 .ed-track-label .tl-lbl{font-size:8px;color:var(--hint);font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
 .ed-track-label .tl-add{font-size:14px;color:rgba(124,92,252,0.6);cursor:pointer;line-height:1;margin-top:2px;transition:color 0.12s}
@@ -333,7 +333,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
 <canvas id="canvas"></canvas>
 
 <!-- LOGIN PAGE -->
-   <div class="page active" id="pg-login">
+<div class="page active" id="pg-login">
   <div style="position:relative;z-index:20;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
     <div class="lcard" id="lcard-login">
       <span class="rev-logo">REV</span>
@@ -821,7 +821,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
       <div class="cropper-overlay"><div class="cropper-circle"></div></div>
       <div id="crop-tap-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5"><button onclick="loadCropImage()" style="background:rgba(124,92,252,0.85);border:1px solid rgba(124,92,252,0.6);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Tap to load image</button></div>
     </div>
-    <div class="cropper-zoom"><span>&#128269;</span><input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/><span>&#128270;</span></div>
+   <div class="cropper-zoom"><span>&#128269;</span><input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/><span>&#128270;</span></div>
     <div class="cropper-actions">
       <button onclick="closeCropper()" style="background:transparent;color:var(--muted);border-color:var(--border2)">Cancel</button>
       <button onclick="applyCrop()" style="background:linear-gradient(135deg,#7c5cfc,#4f9cf9);color:white;border:none;box-shadow:0 0 12px rgba(124,92,252,0.3)">Apply</button>
@@ -1450,28 +1450,34 @@ function edRenderVideoTrack(){
     // Left handle — resize start
     var lh=el.querySelector('.seg-handle.left');
     if(lh)lh.addEventListener('mousedown',function(e){
-      e.stopPropagation();
+      e.stopPropagation();e.preventDefault();
       var startX=e.clientX,origStart=seg.start;
       var scrollL=document.getElementById('ed-tl-scroll');
+      var overlay=document.createElement('div');
+      overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
+      document.body.appendChild(overlay);
       var mm=function(e2){
         var dx=e2.clientX-startX;
         seg.start=Math.max(0,Math.min(seg.end-0.5,origStart+dx/edZoom));
         edRenderVideoTrack();
         if(scrollL){
           var leftPx=edTimeToPx(seg.start)-60;
-          var visLeft=scrollL.scrollLeft+100;
-          if(leftPx<visLeft)scrollL.scrollLeft=Math.max(0,leftPx-120);
+          if(leftPx<scrollL.scrollLeft+100)scrollL.scrollLeft=Math.max(0,leftPx-120);
         }
       };
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      var mu=function(){overlay.remove();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
     // Right handle — resize end
     var rh=el.querySelector('.seg-handle.right');
     if(rh)rh.addEventListener('mousedown',function(e){
-      e.stopPropagation();
+      e.stopPropagation();e.preventDefault();
       var startX=e.clientX,origEnd=seg.end;
       var scrollR=document.getElementById('ed-tl-scroll');
+      // Overlay to prevent cursor from losing track
+      var overlay=document.createElement('div');
+      overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
+      document.body.appendChild(overlay);
       var mm=function(e2){
         var dx=e2.clientX-startX;
         seg.end=Math.max(seg.start+0.5,origEnd+dx/edZoom);
@@ -1479,12 +1485,11 @@ function edRenderVideoTrack(){
         if(scrollR){
           var rightPx=edTimeToPx(seg.end)-60;
           var visRight=scrollR.scrollLeft+scrollR.offsetWidth-100;
-          var visLeft=scrollR.scrollLeft+80;
           if(rightPx>visRight)scrollR.scrollLeft=rightPx-scrollR.offsetWidth+120;
-          else if(rightPx<visLeft)scrollR.scrollLeft=Math.max(0,rightPx-120);
+          else if(rightPx<scrollR.scrollLeft+80)scrollR.scrollLeft=Math.max(0,rightPx-120);
         }
       };
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      var mu=function(){overlay.remove();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
     tc.appendChild(el);
@@ -1663,7 +1668,21 @@ function edRenderAudioTrack(){
     el.addEventListener('mousedown',function(e){
       if(e.target.classList.contains('seg-handle')||e.target.classList.contains('seg-handle-bar')||e.target.classList.contains('seg-del'))return;
       e.stopPropagation();
-      // Backspace delete
+      if(edRazorActive){
+        var scrollEl=document.getElementById('ed-tl-scroll');
+        var sl=scrollEl?scrollEl.scrollLeft:0;
+        var tc2=document.getElementById('ed-track-audio');
+        var rect=tc2.getBoundingClientRect();
+        var t=Math.max(0,(e.clientX-rect.left+sl)/edZoom);
+        if(t>seg.start&&t<seg.end){
+          var newSeg={id:edUid(),label:seg.label,start:t,end:seg.end,url:seg.url,audioEl:seg.audioEl?new Audio(seg.url):null,volume:seg.volume};
+          seg.end=t;
+          edAudioSegs.push(newSeg);
+          edRenderAudioTrack();
+          showToast('Audio cut!');
+        }
+        return;
+      }
       edSelectedAudioSeg=seg.id;
       var startX=e.clientX,origStart=seg.start,origEnd=seg.end,dur=origEnd-origStart;
       var mm=function(e2){seg.start=Math.max(0,origStart+(e2.clientX-startX)/edZoom);seg.end=seg.start+dur;edRenderAudioTrack();};
@@ -1743,11 +1762,9 @@ function edRenderStickerTrack(){
 function edRenderEffectTrack(){
   var tc=document.getElementById('ed-track-effects');
   if(!tc)return;
-  var addBtn=tc.querySelector('.ed-track-add');
   tc.innerHTML='';
-  if(addBtn)tc.appendChild(addBtn);
   var w=edTrackW()-60;
-  tc.style.width=w+'px';tc.style.minWidth=w+'px';tc.style.position='relative';
+  tc.style.cssText='position:relative;width:'+w+'px;min-width:'+w+'px;height:100%;overflow:visible';
   edEffectSegs.forEach(function(seg){
     var left=edTimeToPx(seg.start)-60;
     var width=Math.max(8,(seg.end-seg.start)*edZoom);
@@ -1755,9 +1772,46 @@ function edRenderEffectTrack(){
     el.className='ed-segment ed-seg-effect';
     el.style.left=left+'px';el.style.width=width+'px';
     el.innerHTML='<div class="seg-handle left"><div class="seg-handle-bar"></div></div>'
-      +'<div class="seg-label">✦ '+seg.label+'</div>'
+      +'<div class="seg-label">🎨 '+seg.label+'</div>'
+      +'<div class="seg-del">✕</div>'
       +'<div class="seg-handle right"><div class="seg-handle-bar"></div></div>';
-    tc.insertBefore(el,addBtn||null);
+    el.querySelector('.seg-del').addEventListener('click',function(e){
+      e.stopPropagation();
+      edEffectSegs=edEffectSegs.filter(function(s){return s.id!==seg.id;});
+      edRenderEffectTrack();
+    });
+    el.addEventListener('mousedown',function(e){
+      if(e.target.classList.contains('seg-handle')||e.target.classList.contains('seg-handle-bar')||e.target.classList.contains('seg-del'))return;
+      e.stopPropagation();
+      if(edRazorActive){
+        var scrollEl=document.getElementById('ed-tl-scroll');
+        var sl=scrollEl?scrollEl.scrollLeft:0;
+        var rect=tc.getBoundingClientRect();
+        var t=Math.max(0,(e.clientX-rect.left+sl)/edZoom);
+        if(t>seg.start&&t<seg.end){
+          var ns={id:edUid(),label:seg.label,start:t,end:seg.end,preset:seg.preset,brightness:seg.brightness,contrast:seg.contrast,saturation:seg.saturation,blur:seg.blur};
+          seg.end=t;edEffectSegs.push(ns);edRenderEffectTrack();showToast('Filter cut!');
+        }
+        return;
+      }
+      var startX=e.clientX,origStart=seg.start,dur=seg.end-seg.start;
+      var mm=function(e2){seg.start=Math.max(0,origStart+(e2.clientX-startX)/edZoom);seg.end=seg.start+dur;edRenderEffectTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    el.querySelector('.seg-handle.left').addEventListener('mousedown',function(e){
+      e.stopPropagation();var startX=e.clientX,origStart=seg.start;
+      var mm=function(e2){seg.start=Math.max(0,Math.min(seg.end-0.1,origStart+(e2.clientX-startX)/edZoom));edRenderEffectTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    el.querySelector('.seg-handle.right').addEventListener('mousedown',function(e){
+      e.stopPropagation();var startX=e.clientX,origEnd=seg.end;
+      var mm=function(e2){seg.end=Math.max(seg.start+0.1,origEnd+(e2.clientX-startX)/edZoom);edRenderEffectTrack();};
+      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+    });
+    tc.appendChild(el);
   });
 }
 
@@ -2057,9 +2111,15 @@ function edAddAudio(){
 
 /* --- add effect placeholder --- */
 function edAddEffect(){
-  edEffectSegs.push({id:edUid(),label:'Filter',start:edCurrentTime,end:Math.min(edDuration,edCurrentTime+10)});
+  var name=edPickedFilter||'Filter';
+  var seg={
+    id:edUid(),label:name,start:edCurrentTime,end:Math.min(edDuration,edCurrentTime+10),
+    preset:window._edPresetFilter||'',
+    brightness:edBrVal,contrast:edConVal,saturation:edSatVal,blur:edBlurVal
+  };
+  edEffectSegs.push(seg);
   edRenderEffectTrack();
-  showToast('Effect segment added — drag to reposition');
+  showToast(name+' added to Filter track!');
 }
 
 /* --- render caption list in right panel --- */
@@ -2320,34 +2380,79 @@ function edPlaceSticker(i){
 function edAddStickerToPreview(seg){
   var preview=document.getElementById('ed-preview');
   if(!preview)return;
-  // Remove old instance if exists
   var old=document.getElementById('sticker-'+seg.id);
   if(old)old.remove();
-  var s=document.createElement('div');
-  s.id='sticker-'+seg.id;
-  s.textContent=seg.emoji;
-  s.style.cssText='position:absolute;font-size:44px;cursor:move;user-select:none;top:'+seg.y+'%;left:'+seg.x+'%;z-index:20;line-height:1;display:block';
-  s.addEventListener('dblclick',function(){
-    edStickerSegs=edStickerSegs.filter(function(ss){return ss.id!==seg.id;});
-    edRenderStickerTrack();
-    s.remove();
-  });
-  s.addEventListener('mousedown',function(e){
+  var wrapper=document.createElement('div');
+  wrapper.id='sticker-'+seg.id;
+  var sz=seg.size||44;
+  var rot=seg.rotation||0;
+  wrapper.style.cssText='position:absolute;cursor:move;user-select:none;z-index:20;display:inline-block;left:'+(seg.x||35)+'%;top:'+(seg.y||30)+'%;transform:rotate('+rot+'deg)';
+  var span=document.createElement('span');
+  span.textContent=seg.emoji;
+  span.style.cssText='font-size:'+sz+'px;line-height:1;display:block;position:relative';
+  // Rotate handle
+  var rotHandle=document.createElement('div');
+  rotHandle.style.cssText='position:absolute;width:12px;height:12px;background:#7c5cfc;border:2px solid white;border-radius:50%;cursor:grab;top:-18px;left:50%;transform:translateX(-50%);z-index:21';
+  rotHandle.title='Rotate';
+  // Resize handle
+  var resHandle=document.createElement('div');
+  resHandle.style.cssText='position:absolute;width:12px;height:12px;background:white;border:2px solid #7c5cfc;border-radius:50%;cursor:se-resize;bottom:-6px;right:-6px;z-index:21';
+  resHandle.title='Resize';
+  wrapper.appendChild(span);
+  wrapper.appendChild(rotHandle);
+  wrapper.appendChild(resHandle);
+  // Drag
+  wrapper.addEventListener('mousedown',function(e){
+    if(e.target===rotHandle||e.target===resHandle)return;
     e.preventDefault();
     var pRect=preview.getBoundingClientRect();
-    var ox=e.clientX-pRect.left-parseFloat(s.style.left||'35%')*pRect.width/100;
-    var oy=e.clientY-pRect.top-parseFloat(s.style.top||'30%')*pRect.height/100;
+    var startX=e.clientX,startY=e.clientY;
+    var startL=parseFloat(wrapper.style.left)||35;
+    var startT=parseFloat(wrapper.style.top)||30;
+    // Convert % to px for dragging
+    var startLpx=startL/100*pRect.width;
+    var startTpx=startT/100*pRect.height;
     var mm=function(ev){
-      var r=preview.getBoundingClientRect();
-      var nx=Math.max(0,Math.min(r.width-40,ev.clientX-r.left-ox));
-      var ny=Math.max(0,Math.min(r.height-40,ev.clientY-r.top-oy));
-      s.style.left=nx+'px';s.style.top=ny+'px';
-      seg.x=nx/r.width*100;seg.y=ny/r.height*100;
+      var nx=startLpx+(ev.clientX-startX);
+      var ny=startTpx+(ev.clientY-startY);
+      wrapper.style.left=nx+'px';wrapper.style.top=ny+'px';
+      seg.x=nx/pRect.width*100;seg.y=ny/pRect.height*100;
     };
     var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
     document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
   });
-  preview.appendChild(s);
+  // Rotate
+  rotHandle.addEventListener('mousedown',function(e){
+    e.preventDefault();e.stopPropagation();
+    var rect=wrapper.getBoundingClientRect();
+    var cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+    var mm=function(ev){
+      rot=Math.round(Math.atan2(ev.clientY-cy,ev.clientX-cx)*(180/Math.PI)+90);
+      wrapper.style.transform='rotate('+rot+'deg)';
+      seg.rotation=rot;
+    };
+    var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+    document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+  });
+  // Resize
+  resHandle.addEventListener('mousedown',function(e){
+    e.preventDefault();e.stopPropagation();
+    var startX=e.clientX,startSz=seg.size||44;
+    var mm=function(ev){
+      sz=Math.max(16,Math.min(200,startSz+(ev.clientX-startX)/2));
+      seg.size=Math.round(sz);
+      span.style.fontSize=seg.size+'px';
+    };
+    var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+    document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+  });
+  // Double click to remove
+  wrapper.addEventListener('dblclick',function(){
+    edStickerSegs=edStickerSegs.filter(function(ss){return ss.id!==seg.id;});
+    edRenderStickerTrack();
+    wrapper.remove();
+  });
+  preview.appendChild(wrapper);
 }
 
 /* --- tool switcher --- */
