@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded',function(){
           if(edPlaying)edPlayPause();
           window._edImportedFile=null;edClip=null;
           document.querySelectorAll('input[type=file][accept="video/*"]').forEach(function(i){i.value='';});
-     }
+        }
         edRenderVideoTrack();
         showToast('Segment deleted');
       }
@@ -1451,7 +1451,6 @@ function edRenderVideoTrack(){
     var lh=el.querySelector('.seg-handle.left');
     if(lh)lh.addEventListener('mousedown',function(e){
       e.stopPropagation();e.preventDefault();
-      lh.setPointerCapture(e.pointerId);
       var startX=e.clientX,origStart=seg.start;
       var scrollL=document.getElementById('ed-tl-scroll');
       var overlay=document.createElement('div');
@@ -1473,7 +1472,6 @@ function edRenderVideoTrack(){
     var rh=el.querySelector('.seg-handle.right');
     if(rh)rh.addEventListener('mousedown',function(e){
       e.stopPropagation();e.preventDefault();
-      rh.setPointerCapture(e.pointerId);
       var startX=e.clientX,origEnd=seg.end;
       var scrollR=document.getElementById('ed-tl-scroll');
       var overlay=document.createElement('div');
