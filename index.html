@@ -821,7 +821,7 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
       <div class="cropper-overlay"><div class="cropper-circle"></div></div>
       <div id="crop-tap-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5"><button onclick="loadCropImage()" style="background:rgba(124,92,252,0.85);border:1px solid rgba(124,92,252,0.6);color:white;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;">Tap to load image</button></div>
     </div>
-   <div class="cropper-zoom"><span>&#128269;</span><input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/><span>&#128270;</span></div>
+    <div class="cropper-zoom"><span>&#128269;</span><input type="range" id="cropper-zoom" min="1" max="3" step="0.01" value="1" oninput="updateCropZoom(this.value)"/><span>&#128270;</span></div>
     <div class="cropper-actions">
       <button onclick="closeCropper()" style="background:transparent;color:var(--muted);border-color:var(--border2)">Cancel</button>
       <button onclick="applyCrop()" style="background:linear-gradient(135deg,#7c5cfc,#4f9cf9);color:white;border:none;box-shadow:0 0 12px rgba(124,92,252,0.3)">Apply</button>
@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded',function(){
           if(edPlaying)edPlayPause();
           window._edImportedFile=null;edClip=null;
           document.querySelectorAll('input[type=file][accept="video/*"]').forEach(function(i){i.value='';});
-        }
+     }
         edRenderVideoTrack();
         showToast('Segment deleted');
       }
@@ -1451,6 +1451,7 @@ function edRenderVideoTrack(){
     var lh=el.querySelector('.seg-handle.left');
     if(lh)lh.addEventListener('mousedown',function(e){
       e.stopPropagation();e.preventDefault();
+      lh.setPointerCapture(e.pointerId);
       var startX=e.clientX,origStart=seg.start;
       var scrollL=document.getElementById('ed-tl-scroll');
       var overlay=document.createElement('div');
@@ -1472,9 +1473,9 @@ function edRenderVideoTrack(){
     var rh=el.querySelector('.seg-handle.right');
     if(rh)rh.addEventListener('mousedown',function(e){
       e.stopPropagation();e.preventDefault();
+      rh.setPointerCapture(e.pointerId);
       var startX=e.clientX,origEnd=seg.end;
       var scrollR=document.getElementById('ed-tl-scroll');
-      // Overlay to prevent cursor from losing track
       var overlay=document.createElement('div');
       overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
       document.body.appendChild(overlay);
@@ -1989,6 +1990,23 @@ function edUpdateCapOverlay(){
     var el=document.getElementById('sticker-'+seg.id);
     if(el)el.style.display=(t>=seg.start&&t<=seg.end)?'block':'none';
   });
+  // Apply filter only during active effect segment
+  var activeFx=null;
+  edEffectSegs.forEach(function(seg){if(t>=seg.start&&t<=seg.end)activeFx=seg;});
+  var v=edVid();var y=document.getElementById('ed-yt');
+  if(activeFx){
+    var preset=activeFx.preset||'';
+    var adj='brightness('+(activeFx.brightness||100)+'%) contrast('+(activeFx.contrast||100)+'%) saturate('+(activeFx.saturation||100)+'%)'+(activeFx.blur>0?' blur('+activeFx.blur+'px)':'');
+    var f=(preset+' '+adj).trim();
+    if(v)v.style.filter=f;
+    if(y)y.style.filter=f;
+  }else{
+    // Apply manual sliders only (no preset) when no effect segment active
+    var adj2='brightness('+edBrVal+'%) contrast('+edConVal+'%) saturate('+edSatVal+'%)'+(edBlurVal>0?' blur('+edBlurVal+'px)':'');
+    // Only clear filter if we were in a segment before
+    if(v&&v.style.filter&&v.style.filter!==adj2){v.style.filter=adj2;}
+    if(y&&y.style.filter&&y.style.filter!==adj2){y.style.filter=adj2;}
+  }
 }
 
 /* --- open clip from My Clips --- */
