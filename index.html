@@ -1456,16 +1456,44 @@ function edRenderVideoTrack(){
       var overlay=document.createElement('div');
       overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
       document.body.appendChild(overlay);
+      var scrollRafId=null;
+      var lastClientX=e.clientX;
       var mm=function(e2){
+        lastClientX=e2.clientX;
         var dx=e2.clientX-startX;
         seg.start=Math.max(0,Math.min(seg.end-0.5,origStart+dx/edZoom));
         edRenderVideoTrack();
         if(scrollL){
-          var leftPx=edTimeToPx(seg.start)-60;
-          if(leftPx<scrollL.scrollLeft+100)scrollL.scrollLeft=Math.max(0,leftPx-120);
+          var containerRect=scrollL.getBoundingClientRect();
+          var distFromLeft=e2.clientX-containerRect.left;
+          var distFromRight=containerRect.right-e2.clientX;
+          if(scrollRafId)cancelAnimationFrame(scrollRafId);
+          if(distFromLeft<80){
+            var speed=Math.max(2,Math.round((80-distFromLeft)/5));
+            var scrollFn=function(){
+              scrollL.scrollLeft=Math.max(0,scrollL.scrollLeft-speed);
+              var dx2=lastClientX-startX;
+              seg.start=Math.max(0,Math.min(seg.end-0.5,origStart+dx2/edZoom));
+              edRenderVideoTrack();
+              scrollRafId=requestAnimationFrame(scrollFn);
+            };
+            scrollRafId=requestAnimationFrame(scrollFn);
+          } else if(distFromRight<80){
+            var speed2=Math.max(2,Math.round((80-distFromRight)/5));
+            var scrollFn2=function(){
+              scrollL.scrollLeft+=speed2;
+              scrollRafId=requestAnimationFrame(scrollFn2);
+            };
+            scrollRafId=requestAnimationFrame(scrollFn2);
+          }
         }
       };
-      var mu=function(){overlay.remove();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      var mu=function(){
+        if(scrollRafId)cancelAnimationFrame(scrollRafId);
+        overlay.remove();
+        document.removeEventListener('mousemove',mm);
+        document.removeEventListener('mouseup',mu);
+      };
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
     // Right handle — resize end
@@ -1477,18 +1505,46 @@ function edRenderVideoTrack(){
       var overlay=document.createElement('div');
       overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
       document.body.appendChild(overlay);
+      var scrollRafId=null;
+      var lastClientX=e.clientX;
       var mm=function(e2){
+        lastClientX=e2.clientX;
         var dx=e2.clientX-startX;
         seg.end=Math.max(seg.start+0.5,origEnd+dx/edZoom);
         edRenderVideoTrack();
+        // Auto-scroll when near right edge of scroll container
         if(scrollR){
-          var rightPx=edTimeToPx(seg.end)-60;
-          var visRight=scrollR.scrollLeft+scrollR.offsetWidth-100;
-          if(rightPx>visRight)scrollR.scrollLeft=rightPx-scrollR.offsetWidth+120;
-          else if(rightPx<scrollR.scrollLeft+80)scrollR.scrollLeft=Math.max(0,rightPx-120);
+          var containerRect=scrollR.getBoundingClientRect();
+          var distFromRight=containerRect.right-e2.clientX;
+          var distFromLeft=e2.clientX-containerRect.left;
+          if(scrollRafId)cancelAnimationFrame(scrollRafId);
+          if(distFromRight<80){
+            // Near right edge - keep scrolling right
+            var speed=Math.max(2,Math.round((80-distFromRight)/5));
+            var scrollFn=function(){
+              scrollR.scrollLeft+=speed;
+              var dx2=lastClientX-startX;
+              seg.end=Math.max(seg.start+0.5,origEnd+dx2/edZoom);
+              edRenderVideoTrack();
+              scrollRafId=requestAnimationFrame(scrollFn);
+            };
+            scrollRafId=requestAnimationFrame(scrollFn);
+          } else if(distFromLeft<80){
+            var speed2=Math.max(2,Math.round((80-distFromLeft)/5));
+            var scrollFn2=function(){
+              scrollR.scrollLeft=Math.max(0,scrollR.scrollLeft-speed2);
+              scrollRafId=requestAnimationFrame(scrollFn2);
+            };
+            scrollRafId=requestAnimationFrame(scrollFn2);
+          }
         }
       };
-      var mu=function(){overlay.remove();document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
+      var mu=function(){
+        if(scrollRafId)cancelAnimationFrame(scrollRafId);
+        overlay.remove();
+        document.removeEventListener('mousemove',mm);
+        document.removeEventListener('mouseup',mu);
+      };
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
     tc.appendChild(el);
