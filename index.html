@@ -1471,7 +1471,7 @@ function edRenderVideoTrack(){
           var distFromRight=containerRect.right-e2.clientX;
           if(scrollRafId)cancelAnimationFrame(scrollRafId);
           if(distFromLeft<80){
-            var speed=Math.max(2,Math.round((80-distFromLeft)/5));
+            var speed=Math.max(1,Math.round(Math.pow((80-distFromLeft)/80,2)*20)+1);
             var scrollFn=function(){
               scrollL.scrollLeft=Math.max(0,scrollL.scrollLeft-speed);
               var curS=scrollL.scrollLeft;
@@ -1482,7 +1482,7 @@ function edRenderVideoTrack(){
             };
             scrollRafId=requestAnimationFrame(scrollFn);
           } else if(distFromRight<80){
-            var speed2=Math.max(2,Math.round((80-distFromRight)/5));
+            var speed2=Math.max(1,Math.round(Math.pow((80-distFromRight)/80,2)*20)+1);
             var scrollFn2=function(){
               scrollL.scrollLeft+=speed2;
               scrollRafId=requestAnimationFrame(scrollFn2);
@@ -1523,7 +1523,7 @@ function edRenderVideoTrack(){
           var distFromLeft=e2.clientX-containerRect.left;
           if(scrollRafId)cancelAnimationFrame(scrollRafId);
           if(distFromRight<80){
-            var speed=Math.max(2,Math.round((80-distFromRight)/5));
+            var speed=Math.max(1,Math.round(Math.pow((80-distFromRight)/80,2)*20)+1);
             var scrollFn=function(){
               scrollR.scrollLeft+=speed;
               var curS=scrollR.scrollLeft;
@@ -1534,7 +1534,7 @@ function edRenderVideoTrack(){
             };
             scrollRafId=requestAnimationFrame(scrollFn);
           } else if(distFromLeft<80){
-            var speed2=Math.max(2,Math.round((80-distFromLeft)/5));
+            var speed2=Math.max(1,Math.round(Math.pow((80-distFromLeft)/80,2)*20)+1);
             var scrollFn2=function(){
               scrollR.scrollLeft=Math.max(0,scrollR.scrollLeft-speed2);
               var curS2=scrollR.scrollLeft;
@@ -1558,9 +1558,9 @@ function edRenderVideoTrack(){
     tc.appendChild(el);
   });
 
-  // Click on empty track canvas — razor or seek
+  // Click on empty track canvas or segments — razor or seek
   tc.addEventListener('click',function(e){
-    if(e.target!==tc)return;
+    if(e.target.classList.contains('seg-handle')||e.target.classList.contains('seg-del'))return;
     var scrollEl=document.getElementById('ed-tl-scroll');
     var scrollLeft=scrollEl?scrollEl.scrollLeft:0;
     var rect=tc.getBoundingClientRect();
@@ -1752,22 +1752,21 @@ function edRenderAudioTrack(){
       var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
-    // Left trim
-    el.querySelector('.seg-handle.left').addEventListener('mousedown',function(e){
-      e.stopPropagation();
-      var startX=e.clientX,origStart=seg.start;
-      var mm=function(e2){seg.start=Math.max(0,Math.min(seg.end-0.1,origStart+(e2.clientX-startX)/edZoom));edRenderAudioTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
-    // Right trim
-    el.querySelector('.seg-handle.right').addEventListener('mousedown',function(e){
-      e.stopPropagation();
-      var startX=e.clientX,origEnd=seg.end;
-      var mm=function(e2){seg.end=Math.max(seg.start+0.1,origEnd+(e2.clientX-startX)/edZoom);edRenderAudioTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
+    // Left trim with auto-scroll
+    var scr=document.getElementById('ed-tl-scroll');
+    edMakeTrimHandle(
+      el.querySelector('.seg-handle.left'),
+      function(){return seg.start;},
+      function(orig,dx){seg.start=Math.max(0,Math.min(seg.end-0.1,orig+dx/edZoom));},
+      edRenderAudioTrack, scr
+    );
+    // Right trim with auto-scroll
+    edMakeTrimHandle(
+      el.querySelector('.seg-handle.right'),
+      function(){return seg.end;},
+      function(orig,dx){seg.end=Math.max(seg.start+0.1,orig+dx/edZoom);},
+      edRenderAudioTrack, scr
+    );
     tc.appendChild(el);
   });
 }
@@ -1805,18 +1804,9 @@ function edRenderStickerTrack(){
       var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
-    el.querySelector('.seg-handle.left').addEventListener('mousedown',function(e){
-      e.stopPropagation();var startX=e.clientX,origStart=seg.start;
-      var mm=function(e2){seg.start=Math.max(0,Math.min(seg.end-0.1,origStart+(e2.clientX-startX)/edZoom));edRenderStickerTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
-    el.querySelector('.seg-handle.right').addEventListener('mousedown',function(e){
-      e.stopPropagation();var startX=e.clientX,origEnd=seg.end;
-      var mm=function(e2){seg.end=Math.max(seg.start+0.1,origEnd+(e2.clientX-startX)/edZoom);edRenderStickerTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
+    var scrStk=document.getElementById('ed-tl-scroll');
+    edMakeTrimHandle(el.querySelector('.seg-handle.left'),function(){return seg.start;},function(orig,dx){seg.start=Math.max(0,Math.min(seg.end-0.1,orig+dx/edZoom));},edRenderStickerTrack,scrStk);
+    edMakeTrimHandle(el.querySelector('.seg-handle.right'),function(){return seg.end;},function(orig,dx){seg.end=Math.max(seg.start+0.1,orig+dx/edZoom);},edRenderStickerTrack,scrStk);
     tc.appendChild(el);
   });
 }
@@ -1862,18 +1852,19 @@ function edRenderEffectTrack(){
       var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
       document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
     });
-    el.querySelector('.seg-handle.left').addEventListener('mousedown',function(e){
-      e.stopPropagation();var startX=e.clientX,origStart=seg.start;
-      var mm=function(e2){seg.start=Math.max(0,Math.min(seg.end-0.1,origStart+(e2.clientX-startX)/edZoom));edRenderEffectTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
-    el.querySelector('.seg-handle.right').addEventListener('mousedown',function(e){
-      e.stopPropagation();var startX=e.clientX,origEnd=seg.end;
-      var mm=function(e2){seg.end=Math.max(seg.start+0.1,origEnd+(e2.clientX-startX)/edZoom);edRenderEffectTrack();};
-      var mu=function(){document.removeEventListener('mousemove',mm);document.removeEventListener('mouseup',mu);};
-      document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
-    });
+    var scrFx=document.getElementById('ed-tl-scroll');
+    edMakeTrimHandle(
+      el.querySelector('.seg-handle.left'),
+      function(){return seg.start;},
+      function(orig,dx){seg.start=Math.max(0,Math.min(seg.end-0.1,orig+dx/edZoom));},
+      edRenderEffectTrack, scrFx
+    );
+    edMakeTrimHandle(
+      el.querySelector('.seg-handle.right'),
+      function(){return seg.end;},
+      function(orig,dx){seg.end=Math.max(seg.start+0.1,orig+dx/edZoom);},
+      edRenderEffectTrack, scrFx
+    );
     tc.appendChild(el);
   });
 }
@@ -2537,6 +2528,62 @@ function edAddStickerToPreview(seg){
 
 /* --- tool switcher --- */
 function edInitSFX(){edRenderAudioList();}
+
+/* --- trim helper with auto-scroll --- */
+function edMakeTrimHandle(handle, getVal, setVal, renderFn, scrollEl){
+  handle.addEventListener('mousedown',function(e){
+    e.stopPropagation();e.preventDefault();
+    var startX=e.clientX;
+    var origVal=getVal();
+    var baseScroll=scrollEl?scrollEl.scrollLeft:0;
+    var overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;z-index:9999;cursor:ew-resize';
+    document.body.appendChild(overlay);
+    var rafId=null;
+    var lastX=e.clientX;
+    var mm=function(e2){
+      lastX=e2.clientX;
+      var curScroll=scrollEl?scrollEl.scrollLeft:0;
+      var dx=(e2.clientX-startX)+(curScroll-baseScroll);
+      setVal(origVal,dx);
+      renderFn();
+      if(scrollEl){
+        var r=scrollEl.getBoundingClientRect();
+        var dRight=r.right-e2.clientX;
+        var dLeft=e2.clientX-r.left;
+        if(rafId)cancelAnimationFrame(rafId);
+        if(dRight<80){
+          var spd=Math.max(1,Math.round(Math.pow((80-dRight)/80,2)*20)+1);
+          var fn=function(){
+            scrollEl.scrollLeft+=spd;
+            var cs=scrollEl.scrollLeft;
+            setVal(origVal,(lastX-startX)+(cs-baseScroll));
+            renderFn();
+            rafId=requestAnimationFrame(fn);
+          };
+          rafId=requestAnimationFrame(fn);
+        } else if(dLeft<80){
+          var spd2=Math.max(1,Math.round(Math.pow((80-dLeft)/80,2)*20)+1);
+          var fn2=function(){
+            scrollEl.scrollLeft=Math.max(0,scrollEl.scrollLeft-spd2);
+            var cs2=scrollEl.scrollLeft;
+            setVal(origVal,(lastX-startX)+(cs2-baseScroll));
+            renderFn();
+            rafId=requestAnimationFrame(fn2);
+          };
+          rafId=requestAnimationFrame(fn2);
+        }
+      }
+    };
+    var mu=function(){
+      if(rafId)cancelAnimationFrame(rafId);
+      overlay.remove();
+      document.removeEventListener('mousemove',mm);
+      document.removeEventListener('mouseup',mu);
+    };
+    document.addEventListener('mousemove',mm);document.addEventListener('mouseup',mu);
+  });
+}
 function edImportAudioFile(input){
   if(!input.files||!input.files[0])return;
   var f=input.files[0];
