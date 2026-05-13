@@ -1458,9 +1458,11 @@ function edRenderVideoTrack(){
       document.body.appendChild(overlay);
       var scrollRafId=null;
       var lastClientX=e.clientX;
+      var baseScrollLeft=scrollL?scrollL.scrollLeft:0;
       var mm=function(e2){
         lastClientX=e2.clientX;
-        var dx=e2.clientX-startX;
+        var curScroll=scrollL?scrollL.scrollLeft:0;
+        var dx=(e2.clientX-startX)+(curScroll-baseScrollLeft);
         seg.start=Math.max(0,Math.min(seg.end-0.5,origStart+dx/edZoom));
         edRenderVideoTrack();
         if(scrollL){
@@ -1472,7 +1474,8 @@ function edRenderVideoTrack(){
             var speed=Math.max(2,Math.round((80-distFromLeft)/5));
             var scrollFn=function(){
               scrollL.scrollLeft=Math.max(0,scrollL.scrollLeft-speed);
-              var dx2=lastClientX-startX;
+              var curS=scrollL.scrollLeft;
+              var dx2=(lastClientX-startX)+(curS-baseScrollLeft);
               seg.start=Math.max(0,Math.min(seg.end-0.5,origStart+dx2/edZoom));
               edRenderVideoTrack();
               scrollRafId=requestAnimationFrame(scrollFn);
@@ -1507,23 +1510,24 @@ function edRenderVideoTrack(){
       document.body.appendChild(overlay);
       var scrollRafId=null;
       var lastClientX=e.clientX;
+      var baseScrollLeft=scrollR?scrollR.scrollLeft:0;
       var mm=function(e2){
         lastClientX=e2.clientX;
-        var dx=e2.clientX-startX;
+        var curScroll=scrollR?scrollR.scrollLeft:0;
+        var dx=(e2.clientX-startX)+(curScroll-baseScrollLeft);
         seg.end=Math.max(seg.start+0.5,origEnd+dx/edZoom);
         edRenderVideoTrack();
-        // Auto-scroll when near right edge of scroll container
         if(scrollR){
           var containerRect=scrollR.getBoundingClientRect();
           var distFromRight=containerRect.right-e2.clientX;
           var distFromLeft=e2.clientX-containerRect.left;
           if(scrollRafId)cancelAnimationFrame(scrollRafId);
           if(distFromRight<80){
-            // Near right edge - keep scrolling right
             var speed=Math.max(2,Math.round((80-distFromRight)/5));
             var scrollFn=function(){
               scrollR.scrollLeft+=speed;
-              var dx2=lastClientX-startX;
+              var curS=scrollR.scrollLeft;
+              var dx2=(lastClientX-startX)+(curS-baseScrollLeft);
               seg.end=Math.max(seg.start+0.5,origEnd+dx2/edZoom);
               edRenderVideoTrack();
               scrollRafId=requestAnimationFrame(scrollFn);
@@ -1533,6 +1537,10 @@ function edRenderVideoTrack(){
             var speed2=Math.max(2,Math.round((80-distFromLeft)/5));
             var scrollFn2=function(){
               scrollR.scrollLeft=Math.max(0,scrollR.scrollLeft-speed2);
+              var curS2=scrollR.scrollLeft;
+              var dx3=(lastClientX-startX)+(curS2-baseScrollLeft);
+              seg.end=Math.max(seg.start+0.5,origEnd+dx3/edZoom);
+              edRenderVideoTrack();
               scrollRafId=requestAnimationFrame(scrollFn2);
             };
             scrollRafId=requestAnimationFrame(scrollFn2);
