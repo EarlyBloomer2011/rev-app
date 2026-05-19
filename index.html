@@ -1351,7 +1351,7 @@ function edRenderRuler(){
   while(t<=edDuration+interval){
     var px=edTimeToPx(t)-60; // relative to the track canvas (after label)
     var isMajor=Math.round(t)%Math.max(1,interval*2)===0;
-   html+='<div class="ed-ruler-tick" style="left:'+(px+60)+'px">'
+    html+='<div class="ed-ruler-tick" style="left:'+(px+60)+'px">'
       +'<div class="tick-lbl">'+(isMajor?edSecShort(t):'')+'</div>'
       +'<div class="tick-line'+(isMajor?' major':'')+'"></div>'
       +'</div>';
@@ -2770,4 +2770,4 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 </body>
-</html> 
+</html>
